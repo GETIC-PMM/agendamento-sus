@@ -4,10 +4,16 @@ import App from './App'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './routes/Login'
+import ErrorPage from './routes/ErrorPage'
 
 const router = createBrowserRouter([
-  { path: '/', element: <App /> },
-  { path: '/login', element: <Login /> },
+  {
+    errorElement: <ErrorPage />,
+    children: [
+      { path: '/login', element: <Login /> },
+      { path: '/', element: <App /> }
+    ]
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
