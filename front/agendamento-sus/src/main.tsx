@@ -5,13 +5,15 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './routes/Login'
 import ErrorPage from './routes/ErrorPage'
 import Homepage from './routes/Homepage'
+import TestSchedule from './routes/TestSchedule'
 
 const router = createBrowserRouter([
   {
     errorElement: <ErrorPage />,
     children: [
       { path: '/login', element: <Login /> },
-      { path: '/', element: <Homepage /> }
+      { path: '/', element: <Homepage /> },
+      { path: '/test-schedule', element: <TestSchedule /> }
     ]
   }
 ])
