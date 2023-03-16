@@ -4,7 +4,6 @@ import {
     WeekView,
     Appointments,
 } from '@devexpress/dx-react-scheduler-material-ui';
-import React from 'react'
 
 const TestSchedule = () => {
 
