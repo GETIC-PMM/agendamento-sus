@@ -2,6 +2,7 @@ import UserIcon from '../assets/user-icon.svg'
 import PasswordIcon from '../assets/password-icon.svg'
 import LoginBtnIcon from '../assets/login-btn-icon.svg'
 import GovBrIcon from '../assets/govbr-icon.svg'
+import { MdLogin } from 'react-icons/md'
 
 const Login = () => {
     return (
@@ -19,9 +20,9 @@ const Login = () => {
                         <img src={PasswordIcon} alt="" className='w-4 h-4' />
                         <input type="text" placeholder='Senha' className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full' />
                     </div>
-                    <button type="submit" className='bg-white rounded-full w-[420px] py-3 h-full px-6 relative'>
-                        <img src={LoginBtnIcon} alt="" />
-                        <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-primary-base absolute'>Fazer Login</span>
+                    <button type="submit" className='bg-primary-dark rounded-full w-[420px] py-3 h-full px-6 relative'>
+                        <MdLogin color='white' />
+                        <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-white absolute'>Fazer Login</span>
                     </button>
                 </form>
 
