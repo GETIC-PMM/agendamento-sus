@@ -22,7 +22,7 @@ const Header = (props: HeaderProps) => {
     return (
         <div className="w-screen bg-white drop-shadow-lg block">
             <div className='flex justify-between py-6 border-b-2 px-7'>
-                <div className='flex items-center gap-8'>
+                <div className='flex items-center gap-8 cursor-pointer'>
                     <FiMenu size={26} onClick={handleMenuClick} />
                     <img src={MossoroDigitalLogo} alt="" />
                 </div>

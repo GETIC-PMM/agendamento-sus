@@ -14,7 +14,7 @@ const Sidebar = (props: SidebarProps) => {
     console.log(props.isVisible)
 
     return (
-        <div className={`w-[250px] bg-primary-base h-[calc(100vh-141.6px)] py-9 transition-all ${props.isVisible ? '' : '-translate-x-[250px] absolute'}`}>
+        <div className={`w-[250px] bg-primary-base h-auto py-9 transition-all ${props.isVisible ? '' : '-translate-x-[250px] relative hidden h-full'}`}>
             <div>
                 <button
                     onClick={() => props.callback("inicio")}
