@@ -1,18 +1,50 @@
+import UserIcon from '../assets/user-icon.svg'
+import PasswordIcon from '../assets/password-icon.svg'
+import LoginBtnIcon from '../assets/login-btn-icon.svg'
+import GovBrIcon from '../assets/govbr-icon.svg'
+import { MdLogin } from 'react-icons/md'
+
 const Login = () => {
     return (
-        <div className="h-screen w-screen flex items-center justify-center bg-blue-200">
-            {/* FORM BOX */}
-            <div className="bg-blue-500 px-8 py-12 rounded-md drop-shadow-lg flex flex-col gap-4">
-                <h1 className="text-2xl font-bold text-gray-900 leading-tight text-center">Login</h1>
+        <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
+            <div className="py-16 px-[140px] bg-primary-base flex items-center rounded-[10px] font-medium flex-col gap-7">
 
-                {/* FORM INPUTS */}
-                <form className="flex flex-col">
-                    <label htmlFor="email" className="block text-gray-700 font-bold mb-1">Email</label>
-                    <input type="email" className="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 rounded-md focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" name="email" id="email" />
-                    <label className="mt-2 block text-gray-700 font-bold mb-1" htmlFor="password">Senha</label>
-                    <input type="password" className="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 rounded-md focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" name="password" id="password" />
-                    <button className="mt-8 bg-blue-200 hover:bg-blue-300 text-zinc-900 font-bold py-2 px-4 rounded" type="submit">Entrar</button>
+                <h1 className="text-white text-2xl ">Login</h1>
+
+                <form action="" className='flex flex-col gap-10'>
+                    <div className='bg-white rounded-full w-[420px] py-3 flex items-center px-6 gap-2'>
+                        <img src={UserIcon} alt="" className='w-4 h-4' />
+                        <input type="text" placeholder='Usuário' className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full' />
+                    </div>
+                    <div className='bg-white rounded-full w-[420px] py-3 flex items-center px-6 gap-2'>
+                        <img src={PasswordIcon} alt="" className='w-4 h-4' />
+                        <input type="text" placeholder='Senha' className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full' />
+                    </div>
+                    <button type="submit" className='bg-primary-dark rounded-full w-[420px] py-3 h-full px-6 relative'>
+                        <MdLogin color='white' />
+                        <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-white absolute'>Fazer Login</span>
+                    </button>
                 </form>
+
+                <div className='w-full'>
+                    <div className='h-px w-full bg-white border-0' />
+                    <div className='flex justify-between w-full text-white font-normal text-xs mt-3'>
+                        <div className='flex gap-2'>
+                            <span>•</span>
+                            <a href="" className='underline'>Solicitar novo acesso</a>
+                        </div>
+                        <div className='flex gap-2'>
+                            <span>•</span>
+                            <a href="" className='underline'>Esqueci minha senha</a>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" className='bg-white rounded-full w-[420px] py-3 h-full px-6 relative'>
+                    <img src={GovBrIcon} alt="" className='' />
+                    <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-primary-base absolute font-light'>Entrar com a conta gov.br</span>
+                </button>
+
             </div>
         </div>
     )
