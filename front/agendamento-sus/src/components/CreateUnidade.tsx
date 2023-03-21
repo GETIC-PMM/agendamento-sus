@@ -1,5 +1,13 @@
+import { useState } from 'react';
+import * as dayjs from 'dayjs'
+import { TimePicker } from '@mui/x-date-pickers';
+import { TextField } from '@mui/material';
 
 const CreateUnidade = () => {
+    const [openTime, setOpenTime] = useState<string | null>(dayjs().format());
+    const [closeTime, setCloseTime] = useState<string | null>(dayjs().format());
+
+
     return (
         <div>
             <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6">
@@ -21,12 +29,20 @@ const CreateUnidade = () => {
 
                 <div className="flex gap-8 mt-4">
                     <div className="flex flex-col flex-1">
-                        <label htmlFor="localizacao" className="text-sm font-light">Horário de Abertura</label>
-                        <input type="text" id="localizacao" className="w-full h-10 pl-4 border rounded-md" placeholder="07:00" />
+                        <label htmlFor="openTime" className="text-sm font-light">Horário de Abertura</label>
+                        <TimePicker
+                            value={openTime}
+                            onChange={(newValue) => setOpenTime(newValue)}
+                            renderInput={(params) => <TextField {...params} />}
+                        />
                     </div>
                     <div className="flex flex-col flex-1">
-                        <label htmlFor="localizacao" className="text-sm font-light">Horário de Fechamento</label>
-                        <input type="text" id="localizacao" className="w-full h-10 pl-4 border rounded-md" placeholder="17:00" />
+                        <label htmlFor="closeTime" className="text-sm font-light">Horário de Fechamento</label>
+                        <TimePicker
+                            value={closeTime}
+                            onChange={(newValue) => setCloseTime(newValue)}
+                            renderInput={(params) => <TextField {...params} />}
+                        />
                     </div>
                 </div>
 

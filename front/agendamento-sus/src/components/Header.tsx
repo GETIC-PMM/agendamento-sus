@@ -3,7 +3,6 @@ import { BsBell, BsQuestionCircle, BsFillGrid3X3GapFill, BsFillCircleFill } from
 import MossoroDigitalLogo from '../assets/mossoro-digital-logo.svg'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { useState } from 'react'
 
 interface HeaderProps {
     isVisible: boolean;

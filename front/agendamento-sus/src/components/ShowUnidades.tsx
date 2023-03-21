@@ -33,10 +33,10 @@ const ShowUnidades = () => {
     const tableBorder = "border-r border-zinc-400"
 
     return (
-        <TableContainer component={Paper} className="">
+        <TableContainer component={Paper} className="whitespace-nowrap">
             <Table aria-label="simple table">
                 <TableHead>
-                    <TableRow>
+                    <TableRow >
                         <TableCell colSpan={6} className='bg-primary-base-alt'></TableCell>
                     </TableRow>
                 </TableHead>
