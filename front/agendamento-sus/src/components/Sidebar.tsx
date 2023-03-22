@@ -22,7 +22,7 @@ const Sidebar = (props: SidebarProps) => {
                         ${props.activeSidebar === "inicio" ? "bg-primary-dark border-primary-base-alt" : "bg-primary-base-alt border-primary-light"}`}
                 >
                     <AiFillHome />
-                    Inicio
+                    Dashboard
                 </button>
                 <button
                     onClick={() => props.callback("unidades")}

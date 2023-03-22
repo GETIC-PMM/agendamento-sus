@@ -7,6 +7,7 @@ import { ptBR } from 'date-fns/locale'
 interface HeaderProps {
     isVisible: boolean;
     isVisibleCallback: (isVisible: boolean) => void;
+    activePage: string;
 }
 
 const Header = (props: HeaderProps) => {
@@ -33,7 +34,9 @@ const Header = (props: HeaderProps) => {
                 </div>
             </div>
             <div className='px-7 flex justify-between py-3'>
-                <span className='font-light text-xl'>{`S.U.S -> Início`}</span>
+                <span className='font-light text-xl'>{`S.U.S -> ${props.activePage
+                    .replace(/^(\w)/, (match, p1) => p1.toUpperCase())
+                    .replace('-', ' ')}`}</span>
                 <span className='font-light text-xm text-primary-base'>{formattedDate}</span>
             </div>
         </div>
