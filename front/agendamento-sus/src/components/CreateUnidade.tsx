@@ -30,19 +30,19 @@ const CreateUnidade = () => {
                 <div className="flex gap-8 mt-4">
                     <div className="flex flex-col flex-1">
                         <label htmlFor="openTime" className="text-sm font-light">Horário de Abertura</label>
-                        <TimePicker
+                        {/* <TimePicker
                             value={openTime}
                             onChange={(newValue) => setOpenTime(newValue)}
                             renderInput={(params) => <TextField {...params} />}
-                        />
+                        /> */}
                     </div>
                     <div className="flex flex-col flex-1">
                         <label htmlFor="closeTime" className="text-sm font-light">Horário de Fechamento</label>
-                        <TimePicker
+                        {/* <TimePicker
                             value={closeTime}
                             onChange={(newValue) => setCloseTime(newValue)}
                             renderInput={(params) => <TextField {...params} />}
-                        />
+                        /> */}
                     </div>
                 </div>
 

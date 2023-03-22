@@ -1,10 +1,31 @@
 import UserIcon from '../assets/user-icon.svg'
 import PasswordIcon from '../assets/password-icon.svg'
-import LoginBtnIcon from '../assets/login-btn-icon.svg'
 import GovBrIcon from '../assets/govbr-icon.svg'
 import { MdLogin } from 'react-icons/md'
+import { useState } from 'react'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { redirect } from "react-router-dom";
 
 const Login = () => {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+
+    const handleLogin = () => {
+        // console.log('user', user);
+        // console.log('password', password);
+
+        axios.post('http://localhost:8000/api/login', {
+            email,
+            password
+        }).then(response => {
+            Cookies.set('token', response.data.data.token);
+            return redirect('/homepage');
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     return (
         <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
             <div className="py-16 px-[140px] bg-primary-base flex items-center rounded-[10px] font-medium flex-col gap-7">
@@ -14,13 +35,31 @@ const Login = () => {
                 <form action="" className='flex flex-col gap-10'>
                     <div className='bg-white rounded-full w-[420px] py-3 flex items-center px-6 gap-2'>
                         <img src={UserIcon} alt="" className='w-4 h-4' />
-                        <input type="text" placeholder='Usuário' className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full' />
+                        <input
+                            type="text"
+                            placeholder='Usuário'
+                            className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full'
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
                     </div>
                     <div className='bg-white rounded-full w-[420px] py-3 flex items-center px-6 gap-2'>
                         <img src={PasswordIcon} alt="" className='w-4 h-4' />
-                        <input type="text" placeholder='Senha' className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full' />
+                        <input
+                            type="password"
+                            placeholder='Senha'
+                            className='placeholder:text-primary-base placeholder:text-center placeholder:ml-5 focus:outline-none w-full'
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                     </div>
-                    <button type="submit" className='bg-primary-dark rounded-full w-[420px] py-3 h-full px-6 relative'>
+                    <button
+                        type="submit"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleLogin()
+                        }}
+                        className='bg-primary-dark rounded-full w-[420px] py-3 h-full px-6 relative'>
                         <MdLogin color='white' />
                         <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-white absolute'>Fazer Login</span>
                     </button>
@@ -44,7 +83,6 @@ const Login = () => {
                     <img src={GovBrIcon} alt="" className='' />
                     <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-primary-base absolute font-light'>Entrar com a conta gov.br</span>
                 </button>
-
             </div>
         </div>
     )
