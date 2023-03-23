@@ -16,3 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/chatbot', function () {
+    return view('chatbot.frame');
+});
+
+Route::match(['get', 'post'], '/botman', 'App\Http\Controllers\Messenger\ChatController@handle');
+
+// Route::post('/chatbot', function () {
+//     app('botman')->listen();
+// });
