@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UnitController;
 use App\Http\Controllers\API\AppointmentTypeController;
+use App\Http\Controllers\API\PatientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,7 @@ Route::controller(RegisterController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('units', UnitController::class);
     Route::resource('appointment-types', AppointmentTypeController::class);
+    Route::resource('patients', PatientController::class);
+    Route::get('patients/cns/{cns}', [PatientController::class, 'search'])->name('patients.search');
+    Route::get('patients/lastRecord/{cpf}', [PatientController::class, 'lastRecord'])->name('patients.lastRecord');
 });

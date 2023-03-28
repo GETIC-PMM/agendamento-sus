@@ -8,11 +8,11 @@ class InfoConversation extends Conversation
 {
     protected $cpf;
 
-    public function askName()
+    public function askCPF()
     {
         $this->ask('Seu cpf:', function (Answer $answer) {
             $this->cpf = $answer->getText();
-            $this->say('teste');
+            $this->say('Seu cpf é: ' . $this->cpf);
             // $end = $this->checkName($this->cpf);
             // $this->say($end);
         });
@@ -30,6 +30,6 @@ class InfoConversation extends Conversation
 
     public function run()
     {
-        $this->askName();
+        $this->askCPF();
     }
 }

@@ -78,6 +78,20 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'esus' => [
+            'driver' => 'pgsql',
+            'host' => '172.16.10.140',
+            'port' => '5433',
+            'database' => 'esus',
+            'username' => 'postgres',
+            'password' => 'esus',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // 'search_path' => 'public',
+            // 'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
@@ -125,7 +139,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
