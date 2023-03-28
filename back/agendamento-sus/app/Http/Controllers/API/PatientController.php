@@ -85,9 +85,9 @@ class PatientController extends BaseController
 
     public function lastRecord(string $cpf)
     {
-        $patient = Patient::where('nu_cpf', $cpf)->get('co_seq_tacidadao');
+        $patient = Patient::where('nu_cpf', $cpf)->first();
         $connection = DB::connection('esus')->table('ta_prontuario');
-        $lastRecord = $connection->select('select co_seq_taprontuario from ta_prontuario where co_cidadao = ? order by ASC limit 1', [$patient]);
+        $lastRecord = $connection->select('select * from ta_prontuario where co_cidadao = ? order by ASC', [$patient->co_seq_tacidadao]);
         if (is_null($lastRecord))
             return $this->sendError('Last record not found.');
         else
