@@ -10,9 +10,16 @@ class Unit extends Model
     use HasFactory;
 
     protected $fillable = [
-        'code',
         'name',
+        'rua',
+        'numero',
+        'bairro',
         'open_time',
         'close_time',
     ];
+
+    public function appointmentTypes()
+    {
+        return $this->hasMany(AppointmentType::class);
+    }
 }

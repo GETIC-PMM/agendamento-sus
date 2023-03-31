@@ -36,7 +36,11 @@ class UnitController extends BaseController
 
         $validator = Validator::make($input, [
             'name' => 'required',
-            'code' => 'required'
+            'rua' => 'required',
+            'numero' => 'required',
+            'bairro' => 'required',
+            'open_time' => 'required',
+            'close_time' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -79,7 +83,11 @@ class UnitController extends BaseController
 
         $validator = Validator::make($input, [
             'name' => 'required',
-            'code' => 'required'
+            'rua' => 'required',
+            'numero' => 'required',
+            'bairro' => 'required',
+            'open_time' => 'required',
+            'close_time' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -87,7 +95,11 @@ class UnitController extends BaseController
         }
 
         $unit->name = $input['name'];
-        $unit->code = $input['code'];
+        $unit->rua = $input['rua'];
+        $unit->numero = $input['numero'];
+        $unit->bairro = $input['bairro'];
+        $unit->open_time = $input['open_time'];
+        $unit->close_time = $input['close_time'];
         $unit->save();
 
         return $this->sendResponse($unit, 'Unit updated successfully.')->object();

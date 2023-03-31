@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
             $table->string('name');
-            $table->time('open_time');
-            $table->time('close_time');
+            $table->string('rua');
+            $table->string('numero');
+            $table->string('bairro');
+            $table->unsignedInteger('appointment_type_id');
+            $table->foreign('appointment_type_id')->references('id')->on('appointment_types');
+            $table->datetime('open_time');
+            $table->datetime('close_time');
             $table->timestamps();
         });
     }

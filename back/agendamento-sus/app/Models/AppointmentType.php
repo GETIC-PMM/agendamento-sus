@@ -12,5 +12,11 @@ class AppointmentType extends Model
     protected $fillable = [
         'name',
         'duration',
+        'unit_id',
     ];
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }
