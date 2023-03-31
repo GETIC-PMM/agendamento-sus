@@ -16,6 +16,7 @@ class Unit extends Model
         'bairro',
         'open_time',
         'close_time',
+        'appointment_type_id'
     ];
 
     public function appointmentTypes()

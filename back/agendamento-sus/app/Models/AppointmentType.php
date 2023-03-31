@@ -11,8 +11,7 @@ class AppointmentType extends Model
 
     protected $fillable = [
         'name',
-        'duration',
-        'unit_id',
+        'duration'
     ];
 
     public function unit()
