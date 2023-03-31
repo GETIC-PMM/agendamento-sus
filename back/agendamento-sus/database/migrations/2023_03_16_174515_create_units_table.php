@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('rua');
             $table->string('numero');
             $table->string('bairro');
-            $table->unsignedInteger('appointment_type_id');
-            $table->foreign('appointment_type_id')->references('id')->on('appointment_types');
+            $table->json('appointment_type_id');
             $table->datetime('open_time');
             $table->datetime('close_time');
             $table->timestamps();
