@@ -86,8 +86,14 @@ class PatientController extends BaseController
     public function lastRecord(string $cpf)
     {
         $patient = Patient::where('nu_cpf', $cpf)->first();
+        if (is_null($patient))
+            return $this->sendError('Patient not found.');
         $lastRecord = DB::connection('esus')->table('tb_prontuario')->where('co_cidadao', $patient->co_seq_cidadao)->first();
+        if (is_null($lastRecord))
+            return $this->sendError('Not possible to track last record.');
         $lastVisit = DB::connection('esus')->table('tb_atend')->where('co_prontuario', $lastRecord->co_seq_prontuario)->first();
+        if (is_null($lastVisit))
+            return $this->sendError('Not possible to track last record.');
         $unit = DB::connection('esus')->table('tb_unidade_saude')->select('no_unidade_saude')->where('co_seq_unidade_saude', $lastVisit->co_unidade_saude)->first();
 
         if (is_null($unit))

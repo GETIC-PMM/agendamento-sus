@@ -18,18 +18,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::controller(RegisterController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login');
 });
 
+Route::controller(PatientController::class)->group(function () {
+    Route::get('patients/{cpf}', 'show')->name('patients.show');
+    Route::get('patients/cns/{cns}', 'search')->name('patients.search');
+    Route::get('patients/lastRecord/{cpf}', 'lastRecord')->name('patients.lastRecord');
+});
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('users', 'list');
     Route::resource('units', UnitController::class);
     Route::resource('appointment-types', AppointmentTypeController::class);
-    Route::resource('patients', PatientController::class);
-    Route::get('patients/cns/{cns}', [PatientController::class, 'search'])->name('patients.search');
-    Route::get('patients/lastRecord/{cpf}', [PatientController::class, 'lastRecord'])->name('patients.lastRecord');
+    Route::get('users', [RegisterController::class, 'list'])->name('users.list');
 });
