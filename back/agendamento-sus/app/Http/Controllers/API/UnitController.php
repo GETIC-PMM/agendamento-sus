@@ -40,7 +40,7 @@ class UnitController extends BaseController
             'numero' => 'required',
             'bairro' => 'required',
             'open_time' => 'required',
-            'close_time' => 'required'
+            'close_time' => 'required',
         ]);
 
         if ($validator->fails()) {

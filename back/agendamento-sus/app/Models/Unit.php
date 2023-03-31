@@ -19,6 +19,10 @@ class Unit extends Model
         'appointment_type_id'
     ];
 
+    protected $casts = [
+        'appointment_type_id' => 'array'
+    ];
+
     public function appointmentTypes()
     {
         return $this->hasMany(AppointmentType::class);
