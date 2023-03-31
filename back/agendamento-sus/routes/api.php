@@ -29,6 +29,10 @@ Route::controller(PatientController::class)->group(function () {
     Route::get('patients/lastRecord/{cpf}', 'lastRecord')->name('patients.lastRecord');
 });
 
+Route::controller(UnitController::class)->group(function () {
+    Route::get('units/esus', 'search')->name('units.search');
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('units', UnitController::class);
     Route::resource('appointment-types', AppointmentTypeController::class);

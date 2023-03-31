@@ -102,4 +102,10 @@ class UnitController extends BaseController
 
         return $this->sendResponse([], 'Unit deleted successfully.')->object();
     }
+
+    public function search()
+    {
+        $units = DB::connection('esus')->table('tb_unidade_saude')->select('no_unidade_saude', 'ds_logradouro', 'nu_numero', 'no_bairro')->get();
+        return $this->sendResponse($units, 'Units retrieved successfully.');
+    }
 }
