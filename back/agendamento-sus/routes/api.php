@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UnitController;
 use App\Http\Controllers\API\AppointmentTypeController;
@@ -34,8 +35,13 @@ Route::controller(UnitController::class)->group(function () {
     Route::get('units/{name}', 'searchUnitByName')->name('units.searchByName');
 });
 
+Route::controller(AppointmentController::class)->group(function () {
+    Route::get('appointments/{unit_id}/{date}', 'search')->name('appointments.search');
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('units', UnitController::class);
     Route::resource('appointment-types', AppointmentTypeController::class);
+    Route::resource('appointments', AppointmentController::class);
     Route::get('users', [RegisterController::class, 'list'])->name('users.list');
 });
