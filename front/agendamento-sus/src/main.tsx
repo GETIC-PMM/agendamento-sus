@@ -5,26 +5,44 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './routes/Login'
 import ErrorPage from './routes/ErrorPage'
 import Homepage from './routes/Homepage'
-import TestSchedule from './routes/TestSchedule'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ptBR } from '@mui/material/locale';
+import Agendamento from './routes/cidadao/Agendamento'
+import AgendarAtendimento from './routes/cidadao/AgendarAtendimento'
+import { createContext } from "react";
+
+interface Citizen {
+  name: string;
+  cpf: string;
+  unit: string;
+}
+
+export const CitizenContext = createContext<Citizen | null>(null);
+
+const citizen: Citizen = { name: "", cpf: "", unit: "" };
+
 
 const router = createBrowserRouter([
   {
     errorElement: <ErrorPage />,
     children: [
-      { path: '/login', element: <Login /> },
-      { path: '/', element: <Homepage /> },
-      { path: '/test-schedule', element: <TestSchedule /> }
+      { path: '/admin/login', element: <Login /> },
+      { path: '/admin/dashboard', element: <Homepage /> },
+      { path: '/admin', element: <Homepage /> },
+      { path: '/', element: <Agendamento /> },
+      { path: '/agendamento', element: <AgendarAtendimento /> },
     ]
   }
 ])
 
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <LocalizationProvider adapterLocale={ptBR} dateAdapter={AdapterDateFns}>
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  </LocalizationProvider>
+  <CitizenContext.Provider value={citizen}>
+    <LocalizationProvider adapterLocale={ptBR} dateAdapter={AdapterDayjs}>
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </LocalizationProvider>
+  </CitizenContext.Provider>
 )

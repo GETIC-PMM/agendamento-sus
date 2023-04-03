@@ -67,7 +67,7 @@ const CreateAgentes = () => {
                     </div>
                 </div>
             </Modal>
-            <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6">
+            <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6 drop-shadow">
                 <form action="" onSubmit={() => { onSubmit }}>
 
                     <div className="flex flex-col flex-1">
