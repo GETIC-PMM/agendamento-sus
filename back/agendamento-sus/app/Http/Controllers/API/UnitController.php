@@ -16,7 +16,7 @@ class UnitController extends BaseController
      */
     public function index()
     {
-        $units = UnitResource::collection(Unit::all());
+        $units = Unit::all();
         return $this->sendResponse($units, 'Units retrieved successfully.');
     }
 
@@ -39,6 +39,7 @@ class UnitController extends BaseController
             'rua' => 'required',
             'numero' => 'required',
             'bairro' => 'required',
+            'appointment_type_id' => 'required',
             'open_time' => 'required',
             'close_time' => 'required',
         ]);
@@ -86,6 +87,7 @@ class UnitController extends BaseController
             'rua' => 'required',
             'numero' => 'required',
             'bairro' => 'required',
+            'appointment_type_id' => 'required',
             'open_time' => 'required',
             'close_time' => 'required'
         ]);
