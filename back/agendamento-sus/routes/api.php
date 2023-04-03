@@ -31,6 +31,7 @@ Route::controller(PatientController::class)->group(function () {
 
 Route::controller(UnitController::class)->group(function () {
     Route::get('units/esus', 'search')->name('units.search');
+    Route::get('units/{name}', 'searchUnitByName')->name('units.searchByName');
 });
 
 Route::middleware('auth:sanctum')->group(function () {

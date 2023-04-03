@@ -122,4 +122,10 @@ class UnitController extends BaseController
         $units = DB::connection('esus')->table('tb_unidade_saude')->select('no_unidade_saude', 'ds_logradouro', 'nu_numero', 'no_bairro')->get();
         return $this->sendResponse($units, 'Units retrieved successfully.');
     }
+
+    public function searchUnitByName(string $name)
+    {
+        $units = Unit::select('name')->where('name', 'like', '%' . $name . '%')->get();
+        return $this->sendResponse($units, 'Unit retrieved successfully.');
+    }
 }
