@@ -16,11 +16,14 @@ class Unit extends Model
         'bairro',
         'open_time',
         'close_time',
-        'appointment_type_id'
+        'appointment_type_id',
+        'available_days',
+        'appointment_quantity'
     ];
 
     protected $casts = [
-        'appointment_type_id' => 'array'
+        'appointment_type_id' => 'array',
+        'available_days' => 'array'
     ];
 
     public function appointmentTypes()
