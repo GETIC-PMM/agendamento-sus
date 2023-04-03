@@ -1,8 +1,9 @@
-import { AiFillHome } from 'react-icons/ai'
+import { AiFillHome, AiOutlineSchedule } from 'react-icons/ai'
 import { FaRegHospital } from 'react-icons/fa'
 import { MdOutlineLocalHospital } from 'react-icons/md'
 import { IoIosMedical } from 'react-icons/io'
 import { FaHandHoldingMedical } from 'react-icons/fa'
+import { GrScheduleNew } from 'react-icons/gr'
 
 interface SidebarProps {
     activeSidebar: string;
@@ -37,6 +38,13 @@ const Sidebar = (props: SidebarProps) => {
                         ${props.activeSidebar === "cadastrar-unidades" ? "bg-primary-dark border-primary-base-alt" : "bg-primary-base-alt border-primary-light"}`} >
                     <MdOutlineLocalHospital />
                     Cadastrar Unidades
+                </button>
+                <button
+                    onClick={() => props.callback("tipo-atendimento")}
+                    className={`text-white flex items-center gap-3 w-full text-md font-light py-3 px-2 border-l-4 border-primary-base-alt
+                        ${props.activeSidebar === "tipo-atendimento" ? "bg-primary-dark border-primary-base-alt" : "bg-primary-base-alt border-primary-light"}`} >
+                    <AiOutlineSchedule />
+                    Tipos de Atendimento
                 </button>
                 <button
                     onClick={() => props.callback("agentes")}

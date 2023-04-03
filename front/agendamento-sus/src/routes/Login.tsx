@@ -5,22 +5,25 @@ import { MdLogin } from 'react-icons/md'
 import { useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { generateAccessToken, saveAccessToken } from '../utils/jwtoken.js'
+import jwt from 'jsonwebtoken';
 
 const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
-    const handleLogin = () => {
-        // console.log('user', user);
-        // console.log('password', password);
+    const navigate = useNavigate();
 
+    const handleLogin = () => {
         axios.post('http://localhost:8000/api/login', {
             email,
             password
         }).then(response => {
-            Cookies.set('token', response.data.data.token);
-            return redirect('/homepage');
+            const expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + (1000 * 60));
+            Cookies.set('token', response.data.data.token, { expires: expireDate })
+            navigate('/admin/dashboard');
         }).catch(error => {
             console.log(error);
         })
