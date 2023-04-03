@@ -125,7 +125,7 @@ class UnitController extends BaseController
 
     public function searchUnitByName(string $name)
     {
-        $units = Unit::select('name')->where('name', 'like', '%' . $name . '%')->get();
+        $units = Unit::where('name', 'like', '%' . $name . '%')->get();
         return $this->sendResponse($units, 'Unit retrieved successfully.');
     }
 }
