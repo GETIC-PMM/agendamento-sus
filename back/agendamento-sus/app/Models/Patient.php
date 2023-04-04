@@ -10,5 +10,5 @@ class Patient extends Model
     use HasFactory;
 
     protected $connection = 'esus';
-    protected $table = 'ta_cidadao';
+    protected $table = 'tb_cidadao';
 }

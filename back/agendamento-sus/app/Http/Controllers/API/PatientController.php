@@ -39,7 +39,7 @@ class PatientController extends BaseController
      */
     public function show(string $cpf)
     {
-        $patient = Patient::select('co_seq_tacidadao', 'nu_cpf', 'no_cidadao')->where('nu_cpf', $cpf)->first();
+        $patient = Patient::select('co_seq_cidadao', 'nu_cpf', 'no_cidadao')->where('nu_cpf', $cpf)->first();
         if (is_null($patient))
             return $this->sendError('Patient not found.');
         else
