@@ -10,7 +10,8 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'patient_id',
+        'name',
+        'cpf',
         'unit_id',
         'appointment_type_id',
         'date',
