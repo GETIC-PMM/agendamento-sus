@@ -39,7 +39,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <CitizenContext.Provider value={citizen}>
-    <LocalizationProvider adapterLocale={ptBR} dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>

@@ -1,7 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { FormControlLabel, MenuItem, Radio, RadioGroup, Select } from '@mui/material';
+import { Container, FormControlLabel, MenuItem, Radio, RadioGroup, Select, TextField } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+
+import * as dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { cpfFormatter } from '../../utils/cpf-formatter';
 
 interface tiposAtendimentoType {
     id: number,
@@ -15,24 +20,48 @@ const AgendarAtendimento = () => {
     const [unidadeTypes, setUnidadeTypes] = useState<Number[]>([]);
     const [tiposAtendimento, setTiposAtendimento] = useState<tiposAtendimentoType[]>([]);
     const [typesInThisUnit, setTypesInThisUnit] = useState<tiposAtendimentoType[]>([]);
+    const [avaliableDays, setAvaliableDays] = useState<Number[]>([]);
+
+    const [date, setDate] = useState<Date>(dayjs(new Date()).toDate());
 
     const [selectedType, setSelectedType] = useState("")
 
     const citizen = {
         name: "João",
         cpf: "18467496460",
-        unit: "CLINICA ODONTOFISIOMED"
+        unit: "CLINICA QUALIFISIO"
     }
 
     const getUnits = async () => {
         await axios.get(`http://localhost:8000/api/units/${citizen.unit}`)
             .then(response => {
-                console.log("UNIDADE TYPES: ", response.data.data[0].appointment_type_id)
                 setUnidadeTypes(response.data.data[0].appointment_type_id)
             })
             .catch(error => {
                 console.log(error);
             })
+
+        await axios.get(`http://localhost:8000/api/units/${citizen.unit}`, {
+            headers: {
+                'Authorization': 'Bearer ' + Cookies.get('token')
+            }
+        }).then(res => {
+            setUnidade(res.data.data[0])
+            const _avaliableDays = [] as number[];
+            res.data.data[0].available_days.map((avaliable_day: string) => {
+                if (avaliable_day === "domingo") _avaliableDays.push(0);
+                if (avaliable_day === "segunda") _avaliableDays.push(1);
+                if (avaliable_day === "terca") _avaliableDays.push(2);
+                if (avaliable_day === "quarta") _avaliableDays.push(3);
+                if (avaliable_day === "quinta") _avaliableDays.push(4);
+                if (avaliable_day === "sexta") _avaliableDays.push(5);
+                if (avaliable_day === "sabado") _avaliableDays.push(6);
+            })
+            setAvaliableDays(_avaliableDays);
+            console.log(res.data.data[0])
+        }).catch(err => {
+            console.log(err)
+        })
     }
 
     const getTiposAntendimento = async () => {
@@ -55,7 +84,14 @@ const AgendarAtendimento = () => {
         await getTiposAntendimento()
     }
 
-
+    const shouldDisableDate = (date: Date) => {
+        const _day = dayjs(date).day();
+        if (!avaliableDays.includes(_day)) {
+            return true
+        } else {
+            return false
+        }
+    }
 
     useEffect(() => {
         if (citizen?.name === "" || citizen?.cpf === "" || citizen?.unit === "") {
@@ -63,7 +99,6 @@ const AgendarAtendimento = () => {
         }
 
         getInfos();
-        console.log("RESULTS: ", typesInThisUnit)
     }, [])
 
     useEffect(() => {
@@ -87,7 +122,7 @@ const AgendarAtendimento = () => {
                     <div className='flex flex-col gap-3 w-full'>
                         <div className='flex gap-3 w-full'>
                             <input value={citizen?.name} disabled className="w-full text-white h-10 pl-4 border rounded-md" />
-                            <input value={citizen?.cpf} disabled className="w-full text-white h-10 pl-4 border rounded-md" />
+                            <input value={cpfFormatter(citizen?.cpf)} disabled className="w-full text-white h-10 pl-4 border rounded-md" />
                         </div>
                         <input value={citizen?.unit} disabled className="text-white h-10 pl-4 border rounded-md" />
                         <div>
@@ -117,6 +152,18 @@ const AgendarAtendimento = () => {
                         </div>
                         <div>
                             <h2 className='text-white mt-4'>Escolha a data:</h2>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    value={date}
+
+                                    onChange={(newValue) => {
+                                        setDate(newValue as Date);
+                                    }}
+                                    shouldDisableDate={shouldDisableDate}
+                                    className='w-full text-white bg-white pl-4 border rounded-md'
+                                    renderInput={(params) => <TextField className='w-full text-white h-10 pl-4 border rounded-md' {...params} />}
+                                />
+                            </LocalizationProvider>
                         </div>
 
                         <button onClick={() => { console.log(selectedType) }}>checar</button>

@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 
 import { useNavigate } from 'react-router-dom';
 import { CitizenContext } from '../../main';
+import { cpfFormatter } from '../../utils/cpf-formatter';
 
 const Agendamento = () => {
     const [cpf, setCpf] = useState<string>('');
@@ -93,14 +94,7 @@ const Agendamento = () => {
         return true;
     }
 
-    function cpfFormatter(v: string) {
-        v = v.replace(/\D/g, "")                    //Remove tudo o que não é dígito
-        v = v.replace(/(\d{3})(\d)/, "$1.$2")       //Coloca um ponto entre o terceiro e o quarto dígitos
-        v = v.replace(/(\d{3})(\d)/, "$1.$2")       //Coloca um ponto entre o terceiro e o quarto dígitos
-        //de novo (para o segundo bloco de números)
-        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2") //Coloca um hífen entre o terceiro e o quarto dígitos
-        return v
-    }
+
 
     const handleAgendamento = () => {
         if (citizen) {
