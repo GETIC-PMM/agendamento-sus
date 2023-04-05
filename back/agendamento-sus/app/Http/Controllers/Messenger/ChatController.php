@@ -26,18 +26,12 @@ class ChatController extends Controller
             ],
         ], new LaravelCache());
 
-        $botman->hears('oi', function ($bot) {
-            $bot->reply('Olá, como posso ajudar?');
-            $bot->startConversation(new InfoConversation());
+        $botman->hears('oi|olá', function ($bot) {
+            $bot->startConversation(new OngoingConversation());
         });
 
         $botman->listen();
     }
-
-    // public function startConversation(BotMan $bot)
-    // {
-    //     $bot->startConversation(new InfoConversation());
-    // }
 
     public function frame()
     {
