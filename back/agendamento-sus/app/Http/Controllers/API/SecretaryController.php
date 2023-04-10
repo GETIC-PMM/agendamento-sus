@@ -81,4 +81,15 @@ class SecretaryController extends BaseController
         }
         return $this->sendResponse($list, 'List retrieved successfully.');
     }
+
+    public function listAppointmentTypes(int $unit_id)
+    {
+        $list = Secretary::where('unit_id', $unit_id)
+            ->get();
+
+        if (is_null($list)) {
+            return $this->sendError('List not found.');
+        }
+        return $this->sendResponse($list, 'List retrieved successfully.');
+    }
 }

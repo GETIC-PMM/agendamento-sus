@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Messenger;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppointmentType;
 use App\Models\Patient;
 use App\Models\Unit;
 use BotMan\BotMan\Messages\Conversations\Conversation;
@@ -81,7 +82,7 @@ class OngoingConversation extends Conversation
             $this->ask($question, function (Answer $answer) {
                 if ($answer->isInteractiveMessageReply()) {
                     if ($answer->getValue() === 'sim') {
-                        $this->appointmentType($this->patient, $this->unit_name);
+                        $this->checkUnit($this->patient, $this->unit_name);
                     } else {
                         $this->say('Ok, vamos tentar novamente');
                         $this->askCPF();
@@ -91,23 +92,29 @@ class OngoingConversation extends Conversation
         }
     }
 
+    public function checkUnit($patient, $unit_name)
+    {
+        //checar se a Unidade de saúde está no banco local
+        $unit = Unit::where('name', $unit_name)->first();
+        if (is_null($unit))
+            $this->say('Não foi possível encontrar a unidade de saúde informada. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
+        else
+            $this->appointmentType($patient, $unit_name);
+    }
+
     public function appointmentType($patient, $unit)
     {
-        $question = Question::create('Qual o tipo de atendimento que você deseja?')->callbackId('appointment_type')->addButtons([
-            Button::create('Clínico Geral')->value('clinico_geral'),
-            Button::create('Odontologia')->value('odontologia'),
-        ]);
+        $tipos_consulta = AppointmentType::all();
+        $buttons = [];
+        foreach ($tipos_consulta as $tipo_consulta) {
+            $buttons[] = Button::create($tipo_consulta->name)->value($tipo_consulta->name);
+        }
+        $question = Question::create('Qual o tipo de atendimento que você deseja?')->callbackId('appointment_type')->addButtons($buttons);
 
-        //$unit = Unit::where('name', $unit)->first();
         $this->unit_name = $unit;
-
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
-                if ($answer->getValue() === 'clinico_geral') {
-                    $this->say('Você escolheu Clínico Geral na ' . $this->unit_name);
-                } else {
-                    $this->say('Você escolheu Odontologia na ' . $this->unit_name);
-                }
+                $this->say('Você escolheu ' . $answer->getValue() . ' na ' . $this->unit_name);
             }
         });
     }
