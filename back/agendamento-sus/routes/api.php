@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('appointment-types/{id}', 'destroy')->name('appointment-types.destroy');
     });
 
+    Route::resource('secretaries', SecretaryController::class);
     Route::resource('appointments', AppointmentController::class);
     Route::get('users', [RegisterController::class, 'list'])->name('users.list');
 });
