@@ -39,12 +39,7 @@ class SecretaryController extends BaseController
      */
     public function show(string $unit_id, string $appointement_type_id)
     {
-        $list = Secretary::find($unit_id, $appointement_type_id);
-
-        if (is_null($list)) {
-            return $this->sendError('List not found.');
-        }
-        return $this->sendResponse($list, 'List retrieved successfully.');
+        //
     }
 
     /**
@@ -73,5 +68,17 @@ class SecretaryController extends BaseController
         $list = Secretary::find($id);
         $list->delete();
         return $this->sendResponse($list, 'List deleted successfully.');
+    }
+
+    public function search(int $unit_id, int $appointment_type_id)
+    {
+        $list = Secretary::where('unit_id', $unit_id)
+            ->where('appointment_type_id', $appointment_type_id)
+            ->first();
+
+        if (is_null($list)) {
+            return $this->sendError('List not found.');
+        }
+        return $this->sendResponse($list, 'List retrieved successfully.');
     }
 }

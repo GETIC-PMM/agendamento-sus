@@ -10,9 +10,16 @@ class Secretary extends Model
     use HasFactory;
 
     protected $fillable = [
-        'appointement_type_id',
+        'appointment_type_id',
         'unit_id',
         'quantity',
         'days'
     ];
+
+    protected $casts = [
+        'days' => 'array'
+    ];
+
+    protected $primaryKey = null;
+    public $incrementing = false;
 }

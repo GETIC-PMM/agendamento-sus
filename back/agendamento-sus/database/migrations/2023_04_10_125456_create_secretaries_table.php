@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('secretaries', function (Blueprint $table) {
             $table->unsignedInteger('unit_id');
-            $table->foreign('unit_id')->references('id')->on('units');
             $table->unsignedInteger('appointment_type_id');
-            $table->foreign('appointment_type_id')->references('id')->on('appointment_types');
             $table->primary(['unit_id', 'appointment_type_id']);
+            $table->foreign('unit_id')->references('id')->on('units');
+            $table->foreign('appointment_type_id')->references('id')->on('appointment_types');
             $table->integer('quantity');
             $table->json('days');
             $table->timestamps();

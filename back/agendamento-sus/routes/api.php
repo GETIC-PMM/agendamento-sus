@@ -5,6 +5,7 @@ use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UnitController;
 use App\Http\Controllers\API\AppointmentTypeController;
 use App\Http\Controllers\API\PatientController;
+use App\Http\Controllers\API\SecretaryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::resource('secretaries', SecretaryController::class);
+    Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
+
+
     Route::resource('appointments', AppointmentController::class);
     Route::get('users', [RegisterController::class, 'list'])->name('users.list');
 });
