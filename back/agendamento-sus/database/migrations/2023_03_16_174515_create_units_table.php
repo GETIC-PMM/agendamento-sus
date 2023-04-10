@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('rua');
             $table->string('numero');
             $table->string('bairro');
-            $table->json('appointment_type_id');
             $table->datetime('open_time');
             $table->datetime('close_time');
             $table->timestamps();

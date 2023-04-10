@@ -91,21 +91,22 @@ class OngoingConversation extends Conversation
         }
     }
 
-    public function appointmentType($patient, $unit_name)
+    public function appointmentType($patient, $unit)
     {
         $question = Question::create('Qual o tipo de atendimento que você deseja?')->callbackId('appointment_type')->addButtons([
             Button::create('Clínico Geral')->value('clinico_geral'),
             Button::create('Odontologia')->value('odontologia'),
         ]);
 
-        $unit = Unit::where('name', $unit_name)->first();
+        //$unit = Unit::where('name', $unit)->first();
+        $this->unit_name = $unit;
 
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
                 if ($answer->getValue() === 'clinico_geral') {
-                    $this->say('Você escolheu Clínico Geral');
+                    $this->say('Você escolheu Clínico Geral na ' . $this->unit_name);
                 } else {
-                    $this->say('Você escolheu Odontologia');
+                    $this->say('Você escolheu Odontologia na ' . $this->unit_name);
                 }
             }
         });

@@ -8,7 +8,7 @@ use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class AppointmentController extends Controller
+class AppointmentController extends BaseController
 {
     /**
      * Display a listing of the resource.

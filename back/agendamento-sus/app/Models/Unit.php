@@ -15,15 +15,7 @@ class Unit extends Model
         'numero',
         'bairro',
         'open_time',
-        'close_time',
-        'appointment_type_id',
-        'available_days',
-        'appointment_quantity'
-    ];
-
-    protected $casts = [
-        'appointment_type_id' => 'array',
-        'available_days' => 'array'
+        'close_time'
     ];
 
     public function appointmentTypes()
