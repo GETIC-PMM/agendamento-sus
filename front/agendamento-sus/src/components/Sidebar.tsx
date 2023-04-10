@@ -37,7 +37,7 @@ const Sidebar = (props: SidebarProps) => {
                     className={`text-white flex w-full items-center gap-3 text-md font-light py-3 px-2 border-l-4 border-primary-base-alt
                         ${props.activeSidebar === "cadastrar-unidades" ? "bg-primary-dark border-primary-base-alt" : "bg-primary-base-alt border-primary-light"}`} >
                     <MdOutlineLocalHospital />
-                    Cadastrar Unidades
+                    Cadastrar Unidade
                 </button>
                 <button
                     onClick={() => props.callback("tipo-atendimento")}

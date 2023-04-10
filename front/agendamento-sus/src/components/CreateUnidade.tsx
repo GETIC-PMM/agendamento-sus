@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import * as dayjs from 'dayjs'
 import axios from 'axios';
-import { Autocomplete, Checkbox, FormControlLabel, FormGroup, TextField } from '@mui/material';
+import { Autocomplete, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, TextField } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers';
 import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
+
 
 interface Unidade {
     ds_logradouro: string,
@@ -12,15 +14,21 @@ interface Unidade {
     nu_numero: string,
 }
 
-const CreateUnidade = () => {
+interface CreateUnidadeProps {
+    callback: (str: string) => void;
+}
+
+const CreateUnidade = (props: CreateUnidadeProps) => {
     const [openTime, setOpenTime] = useState<string | null>(dayjs().hour(8).minute(0).format(''));
     const [closeTime, setCloseTime] = useState<string | null>(dayjs().hour(17).minute(0).format(''));
     const [units, setUnits] = useState([]);
     const [selectedUnit, setSelectedUnit] = useState<Unidade | null>(null);
-    const [tiposAtendimento, setTiposAtendimento] = useState<any[]>([]);
-    const [selectedTiposAtendimento, setSelectedTiposAtendimento] = useState<number[]>([]);
     const [selectedWorkingDays, setSelectedWorkingDays] = useState<string[]>([]);
     const [vacancyPerDay, setVacancyPerDay] = useState<number>(0);
+
+    const [includedAtendimentos, setIncludedAtendimentos] = useState<any[]>([]);
+    const [tiposAtendimento, setTiposAtendimento] = useState<any[]>([]);
+    const [selectedTiposAtendimento, setSelectedTiposAtendimento] = useState<number>(-1);
 
     const getTiposAntendimento = async () => {
         await axios.get('http://localhost:8000/api/appointment-types', {
@@ -48,11 +56,11 @@ const CreateUnidade = () => {
         getTiposAntendimento();
     }, [])
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log(Cookies.get('access_token'))
         console.log("SELECTED TIPOS ATENDIMENTO: ", selectedTiposAtendimento)
 
-        axios.post('http://localhost:8000/api/units', {
+        await axios.post('http://localhost:8000/api/units', {
             name: selectedUnit?.no_unidade_saude,
             open_time: openTime,
             close_time: closeTime,
@@ -60,14 +68,26 @@ const CreateUnidade = () => {
             bairro: selectedUnit?.no_bairro,
             rua: selectedUnit?.ds_logradouro,
             numero: selectedUnit?.nu_numero || 0,
-            appointment_type_id: selectedTiposAtendimento,
-            appointment_quantity: vacancyPerDay,
-            available_days: selectedWorkingDays
+            // appointment_type_id: selectedTiposAtendimento,
+            // appointment_quantity: vacancyPerDay,
+            // available_days: selectedWorkingDays
         }, {
             headers: {
                 'Authorization': `Bearer ${Cookies.get('token')}`
             }
+        }).then(res => {
+            console.log(res)
+            props.callback("unidades") // Ir para unidades
+        }
+        ).catch(err => {
+            console.log(err)
         })
+    }
+
+    const addAtendimentoType = () => {
+        const _tiposAtendimento = tiposAtendimento.filter(e => e.id !== selectedTiposAtendimento);
+        setTiposAtendimento(_tiposAtendimento);
+        setIncludedAtendimentos([...includedAtendimentos, selectedTiposAtendimento]);
     }
 
     return (
@@ -113,25 +133,9 @@ const CreateUnidade = () => {
                     />
                 </div>
 
-                <div className="flex flex-col mt-4">
-                    <TextField label="Número de vagas por dia" value={vacancyPerDay || 0} onChange={(e) => { setVacancyPerDay(Number(e.target.value)) }} />
-                </div>
 
-                <h3 className='mt-4'>Tipos de atendimento da unidade:</h3>
-                <div className='flex'>
-                    {
-                        tiposAtendimento.map((tipoAtendimento: any) => {
-                            return (
-                                <FormControlLabel control={<Checkbox onChange={() => {
-                                    if (selectedTiposAtendimento.includes(tipoAtendimento.id)) {
-                                        setSelectedTiposAtendimento(selectedTiposAtendimento.filter((id: any) => id !== tipoAtendimento.id))
-                                    } else {
-                                        setSelectedTiposAtendimento([...selectedTiposAtendimento, tipoAtendimento.id])
-                                    }
-                                }} />} label={tipoAtendimento.name} />
-                            )
-                        })
-                    }
+                {/* <div className="flex flex-col mt-4">
+                    <TextField label="Número de vagas por dia" value={vacancyPerDay || 0} onChange={(e) => { setVacancyPerDay(Number(e.target.value)) }} />
                 </div>
 
                 <h3 className='mt-4'>Dias de atendimento da unidade:</h3>
@@ -206,9 +210,8 @@ const CreateUnidade = () => {
 
                             console.log(selectedWorkingDays)
                         }} />} label="Sábado" />
-                </div>
+                </div> */}
 
-                <button onClick={() => { console.log(selectedWorkingDays) }}>checar</button>
                 <button
                     className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
                     onClick={(e) => {

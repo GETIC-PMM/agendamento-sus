@@ -13,6 +13,20 @@ const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    const criarUser = () => {
+        axios.post('http://localhost:8000/api/register', {
+            name: "jorge",
+            email: "jorge@email.com",
+            password: "admin",
+            c_password: "admin"
+        }).then(response => {
+            console.log(response)
+        }).catch(error => {
+            console.log(error);
+        }
+        )
+    }
+
     const navigate = useNavigate();
 
     const handleLogin = () => {
@@ -86,6 +100,8 @@ const Login = () => {
                     <img src={GovBrIcon} alt="" className='' />
                     <span className='top-1/2 -translate-y-1/2 w-full left-0 text-center text-primary-base absolute font-light'>Entrar com a conta gov.br</span>
                 </button>
+
+                <button onClick={criarUser}>Criar</button>
             </div>
         </div>
     )
