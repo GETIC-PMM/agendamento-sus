@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('cpf');
             $table->datetime('date');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedInteger('unit_id');
             $table->foreign('unit_id')->references('id')->on('units');
             $table->unsignedInteger('appointment_type_id');
