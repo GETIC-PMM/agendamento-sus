@@ -39,9 +39,6 @@ class UnitController extends BaseController
             'rua' => 'required',
             'numero' => 'required',
             'bairro' => 'required',
-            'appointment_type_id' => 'required',
-            'appointment_quantity' => 'required',
-            'available_days' => 'required',
             'open_time' => 'required',
             'close_time' => 'required',
         ]);
@@ -89,9 +86,6 @@ class UnitController extends BaseController
             'rua' => 'required',
             'numero' => 'required',
             'bairro' => 'required',
-            'appointment_type_id' => 'required',
-            'appointment_quantity' => 'required',
-            'available_days' => 'required',
             'open_time' => 'required',
             'close_time' => 'required'
         ]);
