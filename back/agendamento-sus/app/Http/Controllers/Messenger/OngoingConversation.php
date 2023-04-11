@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Messenger;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\AppointmentType;
 use App\Models\Patient;
 use App\Models\Secretary;
@@ -11,6 +12,7 @@ use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +24,7 @@ class OngoingConversation extends Conversation
     protected $unit;
     protected $day;
     protected $tipo;
+    protected $date;
 
     public function askName()
     {
@@ -121,11 +124,11 @@ class OngoingConversation extends Conversation
                 $this->say('Você escolheu ' . $answer->getValue() . ' na ' . $this->unit->name);
                 $this->tipo = $answer->getValue();
             }
-            $this->askDate($this->patient, $this->unit, $this->tipo);
+            $this->askDate($this->unit, $this->tipo);
         });
     }
 
-    public function askDate($patient, $unit, $tipo)
+    public function askDate($unit, $tipo)
     {
         $secretary = Secretary::where('unit_id', $unit->id)->where('appointment_type_id', $tipo)->first();
         $buttons = [];
@@ -143,9 +146,85 @@ class OngoingConversation extends Conversation
                 if ($answer->isInteractiveMessageReply()) {
                     $this->say('Você escolheu ' . $answer->getValue());
                     $this->day = $answer->getValue();
+                    $this->createAppointment();
                 }
             });
         }
+    }
+
+    public function createAppointment()
+    {
+        //criando lógica para pegar a data da proxima ocorrencia do dia da semana escolhido
+        $translate = [
+            'Segunda' => 'Monday',
+            'Terça' => 'Tuesday',
+            'Quarta' => 'Wednesday',
+            'Quinta' => 'Thursday',
+            'Sexta' => 'Friday',
+            'Sábado' => 'Saturday',
+            'Domingo' => 'Sunday',
+        ];
+
+        $translated = $translate[$this->day];
+
+        $date = Carbon::now();
+        $date->next($translated);
+        $date->hour = 8;
+        $date->minute = 0;
+        $date->second = 0;
+        $this->date = $date;
+
+        $this->say('
+            <b>Confirmação de Agendamento</b>
+            <br>
+            <br>
+            <b>Unidade de Saúde:</b> ' . $this->unit->name . '
+            <br>
+            <b>Tipo de Consulta:</b> ' . AppointmentType::find($this->tipo)->name . '
+            <br>
+            <b>Dia da Semana:</b> ' . $this->day . '
+            <br>
+            <b>Data:</b> ' . $this->date . '
+            <br>
+            <br>');
+
+        $question = Question::create('Confirmar o agendamento?')->callbackId('confirm_appointment')->addButtons([
+            Button::create('Sim')->value('sim'),
+            Button::create('Não')->value('nao'),
+        ]);
+
+        $this->ask($question, function (Answer $answer) {
+            if ($answer->isInteractiveMessageReply()) {
+                if ($answer->getValue() === 'sim') {
+                    $this->saveAppointment();
+                } else {
+                    $this->say('Ok, vamos tentar novamente');
+                    $this->askDate($this->unit, $this->tipo);
+                }
+            }
+        });
+    }
+
+    public function saveAppointment()
+    {
+        //atualizando a quantidade de vagas disponíveis
+        // $secretary = Secretary::select('days')::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
+        // $day = $secretary->days->where('day', $this->day)->first();
+        // $day['slots'] = $day['slots'] - 1;
+        // //$secretary->days = $secretary->days->where('day', '!=', $this->day)->push($day);
+        // $secretary->save();
+
+        //criando o agendamento
+        Appointment::create([
+            'name' => $this->patient->name,
+            'cpf' => $this->patient->cpf,
+            'unit_id' => $this->unit->id,
+            'appointment_type_id' => $this->tipo,
+            'date' => $this->date,
+            'status' => 'Agendado',
+        ]);
+
+        $this->say('Sua consulta foi agendada com sucesso!');
     }
 
     public function run()

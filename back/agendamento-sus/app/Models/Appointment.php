@@ -12,10 +12,9 @@ class Appointment extends Model
     protected $fillable = [
         'name',
         'cpf',
+        'date',
         'unit_id',
         'appointment_type_id',
-        'date',
-        'time',
         'status'
     ];
 }
