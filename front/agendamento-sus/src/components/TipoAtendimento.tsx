@@ -20,6 +20,8 @@ const TipoAtendimento = () => {
             }
         });
 
+        setNewAtendimento('');
+        setNewDuration(0);
         getTiposAntendimento();
     }
 

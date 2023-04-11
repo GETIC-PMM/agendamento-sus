@@ -8,10 +8,12 @@ import CreateAgentes from "../components/CreateAgentes";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import TipoAtendimento from "../components/TipoAtendimento";
+import Dashboard from "../components/Dashboard";
 
 const Homepage = () => {
     const [activeSidebar, setActiveSidebar] = useState("");
     const [sidebarIsVisible, setSidebarIsVisible] = useState(true);
+    const [editId, setEditId] = useState(-1);
 
     const navigate = useNavigate();
 
@@ -30,9 +32,9 @@ const Homepage = () => {
                 <Sidebar isVisible={sidebarIsVisible} activeSidebar={activeSidebar} callback={setActiveSidebar} />
                 <div className="w-full flex justify-center">
                     <div className="w-[80%] py-9">
-                        {activeSidebar === "inicio" && <div>oi</div>}
+                        {activeSidebar === "inicio" && <Dashboard />}
                         {activeSidebar === "unidades" && <ShowUnidades />}
-                        {activeSidebar === "cadastrar-unidades" && <CreateUnidade />}
+                        {activeSidebar === "cadastrar-unidades" && <CreateUnidade callback={setActiveSidebar} />}
                         {activeSidebar === "tipo-atendimento" && <TipoAtendimento />}
                         {activeSidebar === "agentes" && <ShowAgentes />}
                         {activeSidebar === "cadastrar-agentes" && <CreateAgentes />}
