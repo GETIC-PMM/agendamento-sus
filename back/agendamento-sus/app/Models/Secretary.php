@@ -12,7 +12,6 @@ class Secretary extends Model
     protected $fillable = [
         'appointment_type_id',
         'unit_id',
-        'quantity',
         'days'
     ];
 

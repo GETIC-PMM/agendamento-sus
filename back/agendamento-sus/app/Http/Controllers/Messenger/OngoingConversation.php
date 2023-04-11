@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Messenger;
 use App\Http\Controllers\Controller;
 use App\Models\AppointmentType;
 use App\Models\Patient;
+use App\Models\Secretary;
 use App\Models\Unit;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer;
@@ -18,7 +19,9 @@ class OngoingConversation extends Conversation
     protected $name;
     protected $cpf;
     protected $patient;
-    protected $unit_name;
+    protected $unit;
+    protected $day;
+    protected $tipo;
 
     public function askName()
     {
@@ -72,7 +75,7 @@ class OngoingConversation extends Conversation
         else {
             $this->say('Seu cadastro foi encontrado com sucesso! <br> Seu último atendimento foi realizado na unidade: <br>' . $unit->no_unidade_saude);
 
-            $this->unit_name = $unit->no_unidade_saude;
+            $this->unit = $unit->no_unidade_saude;
 
             $question = Question::create('Essa informação está correta?')->callbackId('check_unidade')->addButtons([
                 Button::create('Sim')->value('sim'),
@@ -82,7 +85,7 @@ class OngoingConversation extends Conversation
             $this->ask($question, function (Answer $answer) {
                 if ($answer->isInteractiveMessageReply()) {
                     if ($answer->getValue() === 'sim') {
-                        $this->checkUnit($this->patient, $this->unit_name);
+                        $this->checkUnit($this->patient, $this->unit);
                     } else {
                         $this->say('Ok, vamos tentar novamente');
                         $this->askCPF();
@@ -99,7 +102,7 @@ class OngoingConversation extends Conversation
         if (is_null($unit))
             $this->say('Não foi possível encontrar a unidade de saúde informada. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
         else
-            $this->appointmentType($patient, $unit_name);
+            $this->appointmentType($patient, $unit);
     }
 
     public function appointmentType($patient, $unit)
@@ -107,19 +110,43 @@ class OngoingConversation extends Conversation
         $tipos_consulta = AppointmentType::all();
         $buttons = [];
         foreach ($tipos_consulta as $tipo_consulta) {
-            $buttons[] = Button::create($tipo_consulta->name)->value($tipo_consulta->name);
+            $buttons[] = Button::create($tipo_consulta->name)->value($tipo_consulta->id);
         }
         $question = Question::create('Qual o tipo de atendimento que você deseja?')->callbackId('appointment_type')->addButtons($buttons);
 
-        $this->unit_name = $unit;
+        $this->unit = $unit;
+        $this->patient = $patient;
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
-                $this->say('Você escolheu ' . $answer->getValue() . ' na ' . $this->unit_name);
+                $this->say('Você escolheu ' . $answer->getValue() . ' na ' . $this->unit->name);
+                $this->tipo = $answer->getValue();
             }
+            $this->askDate($this->patient, $this->unit, $this->tipo);
         });
     }
 
+    public function askDate($patient, $unit, $tipo)
+    {
+        $secretary = Secretary::where('unit_id', $unit->id)->where('appointment_type_id', $tipo)->first();
+        $buttons = [];
+        foreach ($secretary->days as $day) {
+            if ($day['slots'] > 0)
+                $buttons[] = Button::create($day['day'])->value($day['day']);
+        }
 
+        $question = Question::create('Qual o dia da semana vc deseja?')->callbackId('appointment_date')->addButtons($buttons);
+        if (count($buttons) == 0)
+            $this->say('Infelizmente não há mais nenhum dia com vagas disponíveis para esta unidade e este tipo de consulta.');
+        else {
+            $this->say('Para esta Unidade de Saúde e este tipo de consulta temos os seguintes dias disponíveis:');
+            $this->ask($question, function (Answer $answer) {
+                if ($answer->isInteractiveMessageReply()) {
+                    $this->say('Você escolheu ' . $answer->getValue());
+                    $this->day = $answer->getValue();
+                }
+            });
+        }
+    }
 
     public function run()
     {
