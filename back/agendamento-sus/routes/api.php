@@ -65,9 +65,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
     });
 
-
-
-
-    Route::resource('appointments', AppointmentController::class);
+    //Route::resource('appointments', AppointmentController::class);
     Route::get('users', [RegisterController::class, 'list'])->name('users.list');
 });

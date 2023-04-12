@@ -37,6 +37,12 @@ class AppointmentController extends BaseController
         $validator = Validator::make($input, [
             'name' => 'required',
             'cpf' => 'required',
+            'date' => 'required',
+            'status' => 'required',
+            'unit_id' => 'required',
+            'appointment_type_id' => 'required',
+            'phone_number' => 'required',
+            'is_phone_number_whatsapp' => 'required'
         ]);
 
         if ($validator->fails()) {

@@ -15,6 +15,7 @@ use BotMan\BotMan\Messages\Outgoing\Question;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class OngoingConversation extends Conversation
 {
@@ -25,6 +26,8 @@ class OngoingConversation extends Conversation
     protected $day;
     protected $tipo;
     protected $date;
+    protected $phone;
+    protected $whatsapp;
 
     public function askName()
     {
@@ -146,33 +149,58 @@ class OngoingConversation extends Conversation
                 if ($answer->isInteractiveMessageReply()) {
                     $this->say('Você escolheu ' . $answer->getValue());
                     $this->day = $answer->getValue();
-                    $this->createAppointment();
+                    $this->askPhoneNumber();
                 }
             });
         }
     }
 
+    public function askPhoneNumber()
+    {
+        $this->ask('Informe algum número para contato, incluindo DDD?', function (Answer $answer) {
+            if (strlen($answer->getText()) < 10 || strlen($answer->getText()) > 11) {
+                $this->say('<b>Número inválido, por favor informe um número válido</b>');
+                $this->askPhoneNumber();
+            } else {
+                $this->phone = $answer->getText();
+                $this->say('Seu número de telefone é: ' . $this->phone);
+                $question = Question::create('Essa informação está correta?')->callbackId('ask_number')->addButtons([
+                    Button::create('Sim')->value('sim'),
+                    Button::create('Não')->value('nao'),
+                ]);
+
+                $this->ask($question, function (Answer $answer) {
+                    if ($answer->isInteractiveMessageReply()) {
+                        if ($answer->getValue() === 'sim') {
+                            $this->isWhatsapp();
+                        } else {
+                            $this->say('Ok, vamos tentar novamente');
+                            $this->askPhoneNumber();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public function isWhatsapp()
+    {
+        $confirm = Question::create('O número informado é Whatsapp?')->callbackId('confirm_whatsapp')->addButtons([
+            Button::create('Sim')->value('Sim'),
+            Button::create('Não')->value('Não'),
+        ]);
+        $this->ask($confirm, function (Answer $resp) {
+            if ($resp->isInteractiveMessageReply()) {
+                $this->whatsapp = $resp->getText();
+                $this->createAppointment();
+            }
+        });
+    }
+
     public function createAppointment()
     {
-        //criando lógica para pegar a data da proxima ocorrencia do dia da semana escolhido
-        $translate = [
-            'Segunda' => 'Monday',
-            'Terça' => 'Tuesday',
-            'Quarta' => 'Wednesday',
-            'Quinta' => 'Thursday',
-            'Sexta' => 'Friday',
-            'Sábado' => 'Saturday',
-            'Domingo' => 'Sunday',
-        ];
-
-        $translated = $translate[$this->day];
-
-        $date = Carbon::now();
-        $date->next($translated);
-        $date->hour = 8;
-        $date->minute = 0;
-        $date->second = 0;
-        $this->date = $date;
+        $date = $this->findDate($this->day);
+        //$this->date = $date;
 
         $this->say('
             <b>Confirmação de Agendamento</b>
@@ -184,11 +212,15 @@ class OngoingConversation extends Conversation
             <br>
             <b>Dia da Semana:</b> ' . $this->day . '
             <br>
-            <b>Data:</b> ' . $this->date . '
+            <b>Data:</b> ' . $date->format('d/m/Y') . '
+            <br>
+            <b>Telefone:</b> ' . $this->phone . '
+            <br>
+            <b>Whatsapp:</b> ' . $this->whatsapp . '
             <br>
             <br>');
 
-        $question = Question::create('Confirmar o agendamento?')->callbackId('confirm_appointment')->addButtons([
+        $question = Question::create('Confirma o agendamento?')->callbackId('confirm_appointment')->addButtons([
             Button::create('Sim')->value('sim'),
             Button::create('Não')->value('nao'),
         ]);
@@ -196,10 +228,11 @@ class OngoingConversation extends Conversation
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
                 if ($answer->getValue() === 'sim') {
+                    $this->say('Só um instante');
                     $this->saveAppointment();
                 } else {
                     $this->say('Ok, vamos tentar novamente');
-                    $this->askDate($this->unit, $this->tipo);
+                    $this->askPhoneNumber();
                 }
             }
         });
@@ -214,17 +247,44 @@ class OngoingConversation extends Conversation
         // //$secretary->days = $secretary->days->where('day', '!=', $this->day)->push($day);
         // $secretary->save();
 
-        //criando o agendamento
+        $date = $this->findDate($this->day);
+        $is_wpp = $this->whatsapp == 'Sim' ? true : false;
+
         Appointment::create([
-            'name' => $this->patient->name,
-            'cpf' => $this->patient->cpf,
+            'name' => $this->name,
+            'cpf' => $this->cpf,
+            'date' => $date,
             'unit_id' => $this->unit->id,
             'appointment_type_id' => $this->tipo,
-            'date' => $this->date,
+            'phone_number' => $this->phone,
+            'is_phone_number_whatsapp' => $is_wpp,
             'status' => 'Agendado',
         ]);
 
-        $this->say('Sua consulta foi agendada com sucesso!');
+        $this->say('<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
+    }
+
+    public function findDate($day)
+    {
+        $translate = [
+            'Segunda' => 'Monday',
+            'Terça' => 'Tuesday',
+            'Quarta' => 'Wednesday',
+            'Quinta' => 'Thursday',
+            'Sexta' => 'Friday',
+            'Sábado' => 'Saturday',
+            'Domingo' => 'Sunday',
+        ];
+
+        $translated = $translate[$day];
+
+        $date = Carbon::now();
+        $date->next($translated);
+        $date->hour = 8;
+        $date->minute = 0;
+        $date->second = 0;
+
+        return $date;
     }
 
     public function run()
