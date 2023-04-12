@@ -63,9 +63,11 @@ class SecretaryController extends BaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $unit_id, string $appointment_type_id)
     {
-        $list = Secretary::find($id);
+        $list = Secretary::where('unit_id', $unit_id)
+            ->where('appointment_type_id', $appointment_type_id)
+            ->first();
         $list->delete();
         return $this->sendResponse($list, 'List deleted successfully.');
     }
