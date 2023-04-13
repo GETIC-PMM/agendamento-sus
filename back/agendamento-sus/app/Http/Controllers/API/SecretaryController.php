@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Secretary;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SecretaryController extends BaseController
 {
@@ -65,10 +66,7 @@ class SecretaryController extends BaseController
      */
     public function destroy(int $unit_id, int $appointment_type_id)
     {
-        $list = Secretary::where('unit_id', $unit_id)
-            ->where('appointment_type_id', $appointment_type_id)
-            ->first();
-        $list->delete();
+        $list = DB::delete('delete from secretaries where unit_id = ? and appointment_type_id = ?', [$unit_id, $appointment_type_id]);
         return $this->sendResponse($list, 'List deleted successfully.');
     }
 
