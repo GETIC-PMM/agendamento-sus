@@ -67,39 +67,45 @@ class OngoingConversation extends Conversation
 
     public function checkCPF($cpf)
     {
-        $this->patient = Patient::where('nu_cpf', $cpf)->first();
-        $lastRecord = DB::connection('esus')->table('tb_prontuario')->where('co_cidadao', $this->patient->co_seq_cidadao)->first();
-        $lastVisit = DB::connection('esus')->table('tb_atend')->where('co_prontuario', $lastRecord->co_seq_prontuario)->first();
-        $unit = DB::connection('esus')->table('tb_unidade_saude')->select('no_unidade_saude')->where('co_seq_unidade_saude', $lastVisit->co_unidade_saude)->first();
-
-        if (is_null($this->patient))
+        $patient = Patient::where('nu_cpf', $cpf)->first();
+        if (is_null($patient)) {
             $this->say('Não foi possível encontrar seu cadastro no ESUS pelo seu CPF. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
-        elseif (is_null($lastRecord))
-            $this->say('Não foi possível encontrar seu prontuário no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
-        elseif (is_null($lastVisit))
-            $this->say('Não foi possível encontrar seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
-        elseif (is_null($unit))
-            $this->say('Não foi possível encontrar a unidade de saúde do seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
-        else {
-            $this->say('Seu cadastro foi encontrado com sucesso! <br> Seu último atendimento foi realizado na unidade: <br>' . $unit->no_unidade_saude);
-
-            $this->unit = $unit->no_unidade_saude;
-
-            $question = Question::create('Essa informação está correta?')->callbackId('check_unidade')->addButtons([
-                Button::create('Sim')->value('sim'),
-                Button::create('Não')->value('nao'),
-            ]);
-
-            $this->ask($question, function (Answer $answer) {
-                if ($answer->isInteractiveMessageReply()) {
-                    if ($answer->getValue() === 'sim') {
-                        $this->checkUnit($this->patient, $this->unit);
+        } else {
+            $this->patient = $patient;
+            $lastRecord = DB::connection('esus')->table('tb_prontuario')->where('co_cidadao', $patient->co_seq_cidadao)->first();
+            if (is_null($lastRecord)) {
+                $this->say('Não foi possível encontrar seu prontuário no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
+            } else {
+                $lastVisit = DB::connection('esus')->table('tb_atend')->where('co_prontuario', $lastRecord->co_seq_prontuario)->first();
+                if (is_null($lastVisit)) {
+                    $this->say('Não foi possível encontrar seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
+                } else {
+                    $unit = DB::connection('esus')->table('tb_unidade_saude')->select('no_unidade_saude')->where('co_seq_unidade_saude', $lastVisit->co_unidade_saude)->first();
+                    if (is_null($unit)) {
+                        $this->say('Não foi possível encontrar a unidade de saúde do seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
                     } else {
-                        $this->say('Ok, vamos tentar novamente');
-                        $this->askCPF();
+                        $this->say('Seu cadastro foi encontrado com sucesso! <br> Seu último atendimento foi realizado na unidade: <br>' . $unit->no_unidade_saude);
+
+                        $this->unit = $unit->no_unidade_saude;
+
+                        $question = Question::create('Essa informação está correta?')->callbackId('check_unidade')->addButtons([
+                            Button::create('Sim')->value('sim'),
+                            Button::create('Não')->value('nao'),
+                        ]);
+
+                        $this->ask($question, function (Answer $answer) {
+                            if ($answer->isInteractiveMessageReply()) {
+                                if ($answer->getValue() === 'sim') {
+                                    $this->checkUnit($this->patient, $this->unit);
+                                } else {
+                                    $this->say('Ok, vamos tentar novamente');
+                                    $this->askCPF();
+                                }
+                            }
+                        });
                     }
                 }
-            });
+            }
         }
     }
 
@@ -258,19 +264,18 @@ class OngoingConversation extends Conversation
 
         //atualizando a quantidade de vagas disponíveis
         $secretary = Secretary::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
-        $days = $secretary->days;
-        foreach ($days as $key => $day) {
-            if ($day['day'] == $this->day) {
-                $days[$key]['slots'] = $day['slots']--;
-            }
-        }
-        $secretary->days = $days;
+        $days = $secretary->days->toArray();
+        // $days = $secretary->days;
+        // foreach ($days as $key => $day) {
+        //     if ($day['day'] == $this->day) {
+        //         $days[$key]['slots'] = $day['slots'] - 1;
+        //     }
+        // }
+        // $secretary->days = $days;
+        // $secretary->save();
 
-        echo ("<script>console.log('PHP: " . $secretary->days . "');</script>");
 
-        $secretary->save();
-
-        $this->say('<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
+        $this->say($days . '<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
     }
 
     public function findDate($day)
