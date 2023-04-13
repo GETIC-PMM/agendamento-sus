@@ -257,12 +257,18 @@ class OngoingConversation extends Conversation
         ]);
 
         //atualizando a quantidade de vagas disponíveis
-        $secretary = Secretary::select('days')::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
-        $day = $secretary->days->where('day', $this->day)->first();
-        $day['slots'] = $day['slots'] - 1;
-        //$secretary->days = $secretary->days->where('day', '!=', $this->day)->push($day);
-        $secretary->save();
+        $secretary = Secretary::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
+        $days = $secretary->days;
+        foreach ($days as $key => $day) {
+            if ($day['day'] == $this->day) {
+                $days[$key]['slots'] = $day['slots']--;
+            }
+        }
+        $secretary->days = $days;
 
+        echo ("<script>console.log('PHP: " . $secretary->days . "');</script>");
+
+        $secretary->save();
 
         $this->say('<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
     }
