@@ -78,6 +78,8 @@ class OngoingConversation extends Conversation
             $this->say('Não foi possível encontrar seu prontuário no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
         elseif (is_null($lastVisit))
             $this->say('Não foi possível encontrar seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
+        elseif (is_null($unit))
+            $this->say('Não foi possível encontrar a unidade de saúde do seu último atendimento no ESUS. <br> Por favor, procure a unidade de saúde mais próxima para realizar/atualizar seu cadastro.');
         else {
             $this->say('Seu cadastro foi encontrado com sucesso! <br> Seu último atendimento foi realizado na unidade: <br>' . $unit->no_unidade_saude);
 
@@ -240,13 +242,6 @@ class OngoingConversation extends Conversation
 
     public function saveAppointment()
     {
-        //atualizando a quantidade de vagas disponíveis
-        // $secretary = Secretary::select('days')::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
-        // $day = $secretary->days->where('day', $this->day)->first();
-        // $day['slots'] = $day['slots'] - 1;
-        // //$secretary->days = $secretary->days->where('day', '!=', $this->day)->push($day);
-        // $secretary->save();
-
         $date = $this->findDate($this->day);
         $is_wpp = $this->whatsapp == 'Sim' ? true : false;
 
@@ -260,6 +255,14 @@ class OngoingConversation extends Conversation
             'is_phone_number_whatsapp' => $is_wpp,
             'status' => 'Agendado',
         ]);
+
+        //atualizando a quantidade de vagas disponíveis
+        $secretary = Secretary::select('days')::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
+        $day = $secretary->days->where('day', $this->day)->first();
+        $day['slots'] = $day['slots'] - 1;
+        //$secretary->days = $secretary->days->where('day', '!=', $this->day)->push($day);
+        $secretary->save();
+
 
         $this->say('<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
     }

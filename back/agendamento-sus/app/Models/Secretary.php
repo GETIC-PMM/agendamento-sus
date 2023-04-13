@@ -19,6 +19,6 @@ class Secretary extends Model
         'days' => 'array'
     ];
 
-    protected $primaryKey = null;
+    protected $primaryKey = ['unit_id', 'appointment_type_id'];
     public $incrementing = false;
 }
