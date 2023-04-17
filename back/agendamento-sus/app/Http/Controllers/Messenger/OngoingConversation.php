@@ -209,10 +209,15 @@ class OngoingConversation extends Conversation
 
     public function createAppointment()
     {
-        $date = $this->findDate($this->day);
-        //$this->date = $date;
+        $checar = $this->checkSlotsByCPF();
 
-        $this->say('
+        if ($checar == false) {
+            $this->say('Você já possui um agendamento ativo.<br> No momento só é permitido um agendamento por CPF, por tipo de consulta.');
+        } else {
+            $date = $this->findDate($this->day);
+            //$this->date = $date;
+
+            $this->say('
             <b>Confirmação de Agendamento</b>
             <br>
             <br>
@@ -230,22 +235,23 @@ class OngoingConversation extends Conversation
             <br>
             <br>');
 
-        $question = Question::create('Confirma o agendamento?')->callbackId('confirm_appointment')->addButtons([
-            Button::create('Sim')->value('sim'),
-            Button::create('Não')->value('nao'),
-        ]);
+            $question = Question::create('Confirma o agendamento?')->callbackId('confirm_appointment')->addButtons([
+                Button::create('Sim')->value('sim'),
+                Button::create('Não')->value('nao'),
+            ]);
 
-        $this->ask($question, function (Answer $answer) {
-            if ($answer->isInteractiveMessageReply()) {
-                if ($answer->getValue() === 'sim') {
-                    $this->say('Só um instante');
-                    $this->saveAppointment();
-                } else {
-                    $this->say('Ok, vamos tentar novamente');
-                    $this->askPhoneNumber();
+            $this->ask($question, function (Answer $answer) {
+                if ($answer->isInteractiveMessageReply()) {
+                    if ($answer->getValue() === 'sim') {
+                        $this->say('Só um instante');
+                        $this->saveAppointment();
+                    } else {
+                        $this->say('Ok, vamos tentar novamente');
+                        $this->askPhoneNumber();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public function saveAppointment()
@@ -288,6 +294,22 @@ class OngoingConversation extends Conversation
         $date->second = 0;
 
         return $date;
+    }
+
+    public function checkSlotsByCPF()
+    {
+        $appointments = Appointment::where('cpf', $this->cpf)->where('appointment_type_id', $this->tipo)->get();
+        $slots = 0;
+        foreach ($appointments as $appointment) {
+            if ($appointment->status == 'Agendado')
+                $slots++;
+        }
+
+        if ($slots > 1) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public function run()
