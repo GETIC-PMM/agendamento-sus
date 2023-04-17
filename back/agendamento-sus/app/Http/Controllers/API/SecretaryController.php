@@ -91,4 +91,17 @@ class SecretaryController extends BaseController
         }
         return $this->sendResponse($list, 'List retrieved successfully.');
     }
+
+    public function getAppointmentsByUnit(int $unit)
+    {
+        $app = DB::table('secretaries')->join('appointment_types', 'secretaries.appointment_type_id', '=', 'appointment_types.id')
+            ->where('secretaries.unit_id', $unit)
+            ->select('appointment_types.*')
+            ->get();
+
+        if (is_null($app)) {
+            return $this->sendError('List not found.');
+        }
+        return $this->sendResponse($app, 'List retrieved successfully.');
+    }
 }

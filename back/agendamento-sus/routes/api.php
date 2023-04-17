@@ -39,6 +39,7 @@ Route::controller(AppointmentTypeController::class)->group(function () {
 Route::controller(UnitController::class)->group(function () {
     Route::get('units/esus', 'search')->name('units.search');
     Route::get('units/{name}', 'searchUnitByName')->name('units.searchByName');
+    Route::get('units/apointment_type/{id}', 'searchAppointmentByUnit')->name('units.search-appointment-by-unit');
 });
 
 Route::controller(AppointmentController::class)->group(function () {
@@ -62,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('secretaries/{unit_id}/{appointment_type_id}', 'update')->name('secretaries.update');
         Route::delete('secretaries/{unit_id}/{appointment_type_id}', 'destroy')->name('secretaries.destroy');
 
+        Route::get('secretaries/by-unit/{unit_id}', [SecretaryController::class, 'getAppointmentsByUnit'])->name('secretaries.get-appointments-by-unit');
         Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
     });
