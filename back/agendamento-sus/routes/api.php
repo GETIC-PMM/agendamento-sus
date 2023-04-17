@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('secretaries/{unit_id}/{appointment_type_id}', 'update')->name('secretaries.update');
         Route::delete('secretaries/{unit_id}/{appointment_type_id}', 'destroy')->name('secretaries.destroy');
 
-        Route::get('secretaries/appointments_from_unit/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
+        Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
     });
 

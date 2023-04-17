@@ -81,7 +81,7 @@ class SecretaryController extends BaseController
         return $this->sendResponse($list, 'List retrieved successfully.');
     }
 
-    public function listAppointmentsFromUnits(int $unit_id)
+    public function listAppointmentsFromUnit(int $unit_id)
     {
         $list = Secretary::where('unit_id', $unit_id)
             ->get();
