@@ -54,11 +54,10 @@ class SecretaryController extends BaseController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $unit_id, int $appointment_type_id)
     {
-        $list = Secretary::find($id);
-        $list->update($request->all());
-        return $this->sendResponse($list, 'List updated successfully.');
+        $secretary = DB::update('update secretaries set days = ? where unit_id = ? and appointment_type_id = ?', [json_encode($request->days), $unit_id, $appointment_type_id]);
+        return $this->sendResponse($secretary, 'List updated successfully.');
     }
 
     /**
@@ -82,7 +81,7 @@ class SecretaryController extends BaseController
         return $this->sendResponse($list, 'List retrieved successfully.');
     }
 
-    public function listAppointmentTypes(int $unit_id)
+    public function listAppointmentsFromUnits(int $unit_id)
     {
         $list = Secretary::where('unit_id', $unit_id)
             ->get();

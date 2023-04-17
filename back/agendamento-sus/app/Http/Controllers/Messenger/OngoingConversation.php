@@ -142,9 +142,11 @@ class OngoingConversation extends Conversation
     public function askDate($unit, $tipo)
     {
         $secretary = Secretary::where('unit_id', $unit->id)->where('appointment_type_id', $tipo)->first();
+
         $buttons = [];
         foreach ($secretary->days as $day) {
-            if ($day['slots'] > 0)
+            $appointments = Appointment::where('unit_id', $unit->id)->where('date', $this->findDate($day['day']))->count();
+            if (($day['slots'] - $appointments) > 0)
                 $buttons[] = Button::create($day['day'])->value($day['day']);
         }
 
@@ -262,20 +264,7 @@ class OngoingConversation extends Conversation
             'status' => 'Agendado',
         ]);
 
-        //atualizando a quantidade de vagas disponíveis
-        $secretary = Secretary::where('unit_id', $this->unit->id)->where('appointment_type_id', $this->tipo)->first();
-        $days = $secretary->days->toArray();
-        // $days = $secretary->days;
-        // foreach ($days as $key => $day) {
-        //     if ($day['day'] == $this->day) {
-        //         $days[$key]['slots'] = $day['slots'] - 1;
-        //     }
-        // }
-        // $secretary->days = $days;
-        // $secretary->save();
-
-
-        $this->say($days . '<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
+        $this->say('<br><b>Seu agendamento foi realizado com sucesso. <br> Obrigado por utilizar o nosso serviço de agendamento.</b>');
     }
 
     public function findDate($day)

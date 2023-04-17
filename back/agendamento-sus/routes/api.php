@@ -42,6 +42,7 @@ Route::controller(UnitController::class)->group(function () {
 });
 
 Route::controller(AppointmentController::class)->group(function () {
+    Route::get('appointments/units/{unit_id}', 'searchByUnit')->name('appointments.search-by-unit');
     Route::get('appointments/{unit_id}/{date}', 'search')->name('appointments.search');
     Route::post('appointments', 'store')->name('appointments.store');
 });
@@ -58,10 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(SecretaryController::class)->group(function () {
         Route::get('secretaries', 'index')->name('secretaries.index');
         Route::post('secretaries', 'store')->name('secretaries.store');
-        Route::put('secretaries/{id}', 'update')->name('secretaries.update');
+        Route::put('secretaries/{unit_id}/{appointment_type_id}', 'update')->name('secretaries.update');
         Route::delete('secretaries/{unit_id}/{appointment_type_id}', 'destroy')->name('secretaries.destroy');
 
-        Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentTypes'])->name('secretaries.listAppointmentTypes');
+        Route::get('secretaries/appointments_from_unit/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
     });
 

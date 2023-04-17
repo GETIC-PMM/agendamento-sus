@@ -140,4 +140,15 @@ class AppointmentController extends BaseController
 
         return $this->sendResponse($appointment->count(), 'Appointments count retrieved successfully.');
     }
+
+    public function searchByUnit(string $id)
+    {
+        $appointments = Appointment::where('unit_id', $id)->get();
+
+        if (is_null($appointments)) {
+            return $this->sendError('Appointment not found.');
+        }
+
+        return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
+    }
 }
