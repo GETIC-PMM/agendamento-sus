@@ -152,9 +152,9 @@ class AppointmentController extends BaseController
         return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
     }
 
-    public function searchByCPF(string $cpf)
+    public function searchByCPF(int $unit_id, string $cpf)
     {
-        $appointments = Appointment::where('cpf', $cpf)->get();
+        $appointments = Appointment::where('unit_id', $unit_id)->where('cpf', $cpf)->get();
 
         if (is_null($appointments)) {
             return $this->sendError('Appointment not found.');
@@ -163,9 +163,9 @@ class AppointmentController extends BaseController
         return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
     }
 
-    public function searchByDate(string $date)
+    public function searchByDate(int $unit_id, string $date)
     {
-        $appointments = Appointment::where('date', $date)->get();
+        $appointments = Appointment::where('unit_id', $unit_id)->where('date', $date)->get();
 
         if (is_null($appointments)) {
             return $this->sendError('Appointment not found.');
