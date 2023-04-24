@@ -151,4 +151,26 @@ class AppointmentController extends BaseController
 
         return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
     }
+
+    public function searchByCPF(string $cpf)
+    {
+        $appointments = Appointment::where('cpf', $cpf)->get();
+
+        if (is_null($appointments)) {
+            return $this->sendError('Appointment not found.');
+        }
+
+        return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
+    }
+
+    public function searchByDate(string $date)
+    {
+        $appointments = Appointment::where('date', $date)->get();
+
+        if (is_null($appointments)) {
+            return $this->sendError('Appointment not found.');
+        }
+
+        return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
+    }
 }

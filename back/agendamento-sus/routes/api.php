@@ -6,6 +6,7 @@ use App\Http\Controllers\API\UnitController;
 use App\Http\Controllers\API\AppointmentTypeController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\SecretaryController;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('secretaries/by-unit/{unit_id}', [SecretaryController::class, 'getAppointmentsByUnit'])->name('secretaries.get-appointments-by-unit');
         Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
+    });
+
+    Route::controller(AppointmentController::class)->group(function () {
+        Route::get('appointments', 'index')->name('appointments.index');
+        Route::get('appointments/byCPF/{cpf}', 'searchByCPF')->name('search.by-cpf');
+        Route::get('appointments/byDate/{date}', 'searchByDate')->name('search.by-date');
+        Route::get('appointments/{id}', 'show')->name('appointments.show');
+        Route::put('appointments/{id}', 'update')->name('appointments.update');
+        Route::delete('appointments/{id}', 'destroy')->name('appointments.destroy');
     });
 
     //Route::resource('appointments', AppointmentController::class);
