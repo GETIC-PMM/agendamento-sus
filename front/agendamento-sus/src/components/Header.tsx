@@ -27,13 +27,13 @@ const Header = (props: HeaderProps) => {
                     <img src={MossoroDigitalLogo} alt="" />
                 </div>
                 <div className='flex gap-7 items-center'>
-                    <BsBell size={26} />
+                    {/* <BsBell size={26} /> */}
                     <BsQuestionCircle size={26} />
-                    <BsFillGrid3X3GapFill size={26} />
+                    {/* <BsFillGrid3X3GapFill size={26} /> */}
                     <BsFillCircleFill size={26} />
                 </div>
             </div>
-            <div className='px-7 flex justify-between py-3'>
+            <div className='px-7 flex flex-col md:flex-row justify-between py-3'>
                 <span className='font-light text-xl'>{`S.U.S -> ${props.activePage
                     .replace(/^(\w)/, (match, p1) => p1.toUpperCase())
                     .replace('-', ' ')}`}</span>

@@ -28,10 +28,10 @@ const Homepage = () => {
     return (
         <div className="overflow-x-hidden">
             <Header isVisible={sidebarIsVisible} activePage={activeSidebar} isVisibleCallback={setSidebarIsVisible} />
-            <div className="flex min-h-[calc(100vh-141.6px)]">
+            <div className="flex flex-col md:flex-row min-h-[calc(100vh-141.6px)]">
                 <Sidebar isVisible={sidebarIsVisible} activeSidebar={activeSidebar} callback={setActiveSidebar} />
                 <div className="w-full flex justify-center">
-                    <div className="w-[80%] py-9">
+                    <div className="md:px-0 p-2 md:w-[80%] py-9">
                         {activeSidebar === "inicio" && <Dashboard />}
                         {activeSidebar === "unidades" && <ShowUnidades />}
                         {activeSidebar === "cadastrar-unidades" && <CreateUnidade callback={setActiveSidebar} />}

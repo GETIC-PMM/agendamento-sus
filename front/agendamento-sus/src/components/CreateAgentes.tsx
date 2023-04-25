@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios';
-import { Modal } from '@mui/material';
+import { Modal, TextField } from '@mui/material';
 import * as Yup from 'yup';
 
 const CreateAgentes = () => {
@@ -68,13 +68,12 @@ const CreateAgentes = () => {
                 </div>
             </Modal>
             <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6 drop-shadow">
-                <form action="" onSubmit={() => { onSubmit }}>
-
+                <form className="flex flex-col gap-4" action="" onSubmit={() => { onSubmit }}>
                     <div className="flex flex-col flex-1">
-                        <label htmlFor="name" className="text-sm font-light">Nome</label>
-                        <input
+                        <TextField
                             type="text"
                             id="name"
+                            label="Nome"
                             className="w-full h-10 pl-4 border rounded-md"
                             value={name}
                             onChange={(e) => setNome(e.target.value)}
@@ -84,12 +83,12 @@ const CreateAgentes = () => {
 
 
                     <div className="flex flex-col mt-4">
-                        <label htmlFor="email" className="text-sm font-light">Email</label>
-                        <input
+                        <TextField
                             type="text"
                             id="email"
                             className="w-full h-10 pl-4 border rounded-md"
                             value={email}
+                            label="Email"
                             onChange={(e) => setEmail(e.target.value)}
                             autoComplete="off"
                         />
@@ -97,20 +96,20 @@ const CreateAgentes = () => {
 
                     <div className="flex gap-8 mt-4">
                         <div className="flex flex-col flex-1">
-                            <label htmlFor="password" className="text-sm font-light">Senha</label>
-                            <input
+                            <TextField
                                 type="password"
                                 id="name"
                                 className="w-full h-10 pl-4 border rounded-md"
                                 value={password}
+                                label="Senha"
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col flex-1">
-                            <label htmlFor="c_password" className="text-sm font-light">Confirmar senha</label>
-                            <input
+                            <TextField
                                 type="password"
                                 id="c_password"
+                                label="Confirmar senha"
                                 className="w-full h-10 pl-4 border rounded-md"
                                 value={c_password}
                                 onChange={(e) => setC_password(e.target.value)}
