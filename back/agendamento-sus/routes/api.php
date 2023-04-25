@@ -45,6 +45,8 @@ Route::controller(UnitController::class)->group(function () {
 
 Route::controller(AppointmentController::class)->group(function () {
     Route::get('appointments/units/{unit_id}', 'searchByUnit')->name('appointments.search-by-unit');
+    Route::get('appointments/check/{unit_id}/{appointment_type_id}/{date}', 'checkSlots')->name('appointments.check-slots');
+    Route::get('appointments/checkByPatient/{appointment_type_id}/{cpf}', 'checkSlotsByPatient')->name('appointments.check-slots-by-patient');
     //Route::get('appointments/{unit_id}/{date}', 'search')->name('appointments.search');
     Route::post('appointments', 'store')->name('appointments.store');
 });
@@ -74,7 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('appointments/byCPF/{unit_id}/{cpf}', 'searchByCPF')->name('search.by-cpf');
         Route::get('appointments/byDate/{unit_id}/{date}', 'searchByDate')->name('search.by-date');
         Route::get('appointments/{id}', 'show')->name('appointments.show');
-        Route::put('appointments/{id}', 'update')->name('appointments.update');
+        Route::put('appointments/{id}', 'cancelAppointment')->name('appointments.cancel-appintment');
         Route::delete('appointments/{id}', 'destroy')->name('appointments.destroy');
     });
 
