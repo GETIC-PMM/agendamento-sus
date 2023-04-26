@@ -14,13 +14,9 @@ type RegisterUnitParams = {
 export const useMutateRegisterUnit = () => {
   return useMutation({
     mutationFn: (params: RegisterUnitParams) =>
-      instance
-        .post('api/units', {
-          ...params,
-        })
-        .then(
-          response => response.data.data,
-          error => console.error(error),
-        ),
+      instance.post('api/units', params).then(
+        response => response.data.data,
+        error => console.error(error),
+      ),
   });
 };

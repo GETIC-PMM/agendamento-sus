@@ -11,13 +11,9 @@ type RegisterUserParams = {
 export const useMutateRegisterUser = () => {
   return useMutation({
     mutationFn: (params: RegisterUserParams) =>
-      instanceNoAuth
-        .post('/api/register', {
-          ...params,
-        })
-        .then(
-          response => response.data,
-          error => console.error(error),
-        ),
+      instanceNoAuth.post('/api/register', params).then(
+        response => response.data,
+        error => console.error(error),
+      ),
   });
 };
