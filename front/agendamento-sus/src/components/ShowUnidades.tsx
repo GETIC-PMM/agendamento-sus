@@ -11,15 +11,7 @@ import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import * as dayjs from 'dayjs';
 import { Checkbox, CircularProgress, FormControlLabel, IconButton, MenuItem, Modal, Select, TextField, Tooltip } from '@mui/material';
-
-interface Unidade {
-    id: number;
-    name: string;
-    open_time: string;
-    close_time: string;
-    appointment_quantity: number;
-    available_days: string[];
-}
+import { Unidade } from '../interfaces/interfaces';
 
 interface UnitAppointmentType {
     appointment_type_id: number;
