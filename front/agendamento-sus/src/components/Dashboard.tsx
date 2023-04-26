@@ -21,8 +21,6 @@ import {
 import { cpfFormatter } from '../utils/cpf-formatter';
 import Typography from '@mui/material/Typography';
 import * as dayjs from 'dayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import { SecretariesType } from '../routes/cidadao/AgendarAtendimento';
 import requests from '../api/routes/appointments-api';
 import {
   Appointment,
@@ -34,16 +32,12 @@ const Dashboard = () => {
   const [unidadeData, setUnidadeData] = useState<Unidade[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<string>('');
   const [unitAppointments, setUnitAppointments] = useState<Appointment[]>([]);
-  const [selectedAppointmentType, setSelectedAppointmentType] =
-    useState<number>();
   const [unitAppointmentTypes, setUnitAppointmentTypes] = useState<
     UnitAppointmentType[]
   >([]);
   const [cpfToFilter, setCpfToFilter] = useState<string>('');
   const [appointmentSearch, setAppointmentSearch] = useState('');
-
   const [is7DayFilterChecked, setIs7DayFilterChecked] = useState<boolean>(true);
-
   const [isAppointmentDataLoading, setIsAppointmentDataLoading] =
     useState<boolean>(false);
 
