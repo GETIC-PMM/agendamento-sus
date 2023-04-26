@@ -21,19 +21,21 @@ import {
 import { cpfFormatter } from '../utils/cpf-formatter';
 import Typography from '@mui/material/Typography';
 import * as dayjs from 'dayjs';
-import requests from '../api/routes/appointments-api';
+import appointmentsAPI from '../api/routes/appointments-api';
 import {
   Appointment,
   Unidade,
-  UnitAppointmentType,
+  AppointmentType,
 } from '../interfaces/interfaces';
+import { AppointmentForm } from '@devexpress/dx-react-scheduler';
+import appointmentTypeApi from '../api/routes/appointment-type-api';
 
 const Dashboard = () => {
   const [unidadeData, setUnidadeData] = useState<Unidade[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<string>('');
   const [unitAppointments, setUnitAppointments] = useState<Appointment[]>([]);
   const [unitAppointmentTypes, setUnitAppointmentTypes] = useState<
-    UnitAppointmentType[]
+    AppointmentType[]
   >([]);
   const [cpfToFilter, setCpfToFilter] = useState<string>('');
   const [appointmentSearch, setAppointmentSearch] = useState('');
@@ -45,7 +47,7 @@ const Dashboard = () => {
     unitId: string,
     is7DayFilterChecked: boolean,
   ) => {
-    requests
+    appointmentsAPI
       .getUnitAppointmentsById(unitId)
       .then(response => {
         console.log('APPOINTMENTS: ', response);
@@ -69,21 +71,21 @@ const Dashboard = () => {
               status: appointment.status,
             };
           } else {
-            return;
+            return [] as Appointment[];
           }
         });
 
         const filteredArr = _response.filter(
-          (value: Appointment) => value !== undefined,
+          value => value !== undefined || [],
         );
 
         console.log('_RESPONSE DATA AJUSTADA', filteredArr);
 
         if (is7DayFilterChecked) {
-          setUnitAppointments(filteredArr);
+          setUnitAppointments(filteredArr as Appointment[]);
           console.log('FILTROU');
         } else {
-          setUnitAppointments(response.data.data);
+          setUnitAppointments(response as Appointment[]);
           console.log('NAO FILTROU');
         }
 
@@ -95,21 +97,17 @@ const Dashboard = () => {
   };
 
   const getUnitAppointmentsType = async (unitId: string) => {
-    await axios
-      .get(`http://localhost:8000/api/appointment-types/${unitId}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      })
+    appointmentTypeApi
+      .getUnitAppointmentsById(unitId)
       .then(response => {
-        console.log('APPOINTMENTS TYPES: ', response.data.data);
+        console.log('APPOINTMENTS TYPES: ', response);
 
-        if (response.data.data.length === 1) {
-          const _appointmentTypes = [];
-          _appointmentTypes.push(response.data.data);
+        if (response.length === 1) {
+          const _appointmentTypes = [...unitAppointmentTypes];
+          _appointmentTypes.push(response[0]);
           setUnitAppointmentTypes(_appointmentTypes);
         } else {
-          setUnitAppointmentTypes(response.data.data);
+          setUnitAppointmentTypes(response);
         }
 
         setIsAppointmentDataLoading(false);
@@ -192,21 +190,21 @@ const Dashboard = () => {
   }, []);
 
   const getAppointmentTypeName = (appointmentTypeId: number) => {
-    if (unitAppointmentTypes.length) {
-      const _appointmentType = unitAppointmentTypes.find(
-        (appointmentType: UnitAppointmentType) =>
-          appointmentType.id === appointmentTypeId,
-      );
-      return _appointmentType?.name;
-    } else {
-      const _unitAppointmentTypes = [];
-      _unitAppointmentTypes.push(unitAppointmentTypes);
-      const _appointmentType = _unitAppointmentTypes.find(
-        (appointmentType: UnitAppointmentType) =>
-          appointmentType.id === appointmentTypeId,
-      );
-      return _appointmentType?.name;
-    }
+    // if (unitAppointmentTypes.length) {
+    //   const _appointmentType = unitAppointmentTypes.find(
+    //     (appointmentType: AppointmentType) =>
+    //       appointmentType.id === appointmentTypeId,
+    //   );
+    //   return _appointmentType?.name;
+    // } else {
+    //   const _unitAppointmentTypes = [];
+    //   _unitAppointmentTypes.push(unitAppointmentTypes);
+    //   const _appointmentType = _unitAppointmentTypes.find(
+    //     (appointmentType: AppointmentType) =>
+    //       appointmentType.id === appointmentTypeId,
+    //   );
+    //   return _appointmentType?.name;
+    // }
   };
 
   const handleCancelAppointment = async (appointmentId: number) => {
@@ -368,9 +366,9 @@ const Dashboard = () => {
                         {cpfFormatter(appointment.cpf)}
                       </TableCell>
                       <TableCell align="center">
-                        {getAppointmentTypeName(
+                        {/* {getAppointmentTypeName(
                           appointment.appointment_type_id,
-                        )}
+                        )} */}
                       </TableCell>
                       <TableCell align="center">
                         {dayjs(appointment.date).format('DD/MM/YYYY')}

@@ -27,7 +27,7 @@ export interface Appointment {
   is_phone_number_whatsapp: boolean;
 }
 
-export interface UnitAppointmentType {
+export interface AppointmentType {
   id: number;
   duration: number;
   name: string;
