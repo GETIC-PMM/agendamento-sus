@@ -73,6 +73,7 @@ const Dashboard = () => {
 
                 if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
                     return {
+                        id: appointment.id,
                         name: appointment.name,
                         date: appointment.date,
                         cpf: appointment.cpf,
@@ -189,11 +190,27 @@ const Dashboard = () => {
             const _appointmentType = unitAppointmentTypes.find((appointmentType: UnitAppointmentType) => appointmentType.id === appointmentTypeId);
             return _appointmentType?.name;
         } else {
-            const _unitAppointmentTypes = [] as UnitAppointmentType[];
+            const _unitAppointmentTypes = [];
             _unitAppointmentTypes.push(unitAppointmentTypes);
             const _appointmentType = _unitAppointmentTypes.find((appointmentType: UnitAppointmentType) => appointmentType.id === appointmentTypeId);
             return _appointmentType?.name;
         }
+    }
+
+    const handleCancelAppointment = async (appointmentId: number) => {
+        await axios.put(`http://localhost:8000/api/appointments/${appointmentId}`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get('token')}`
+                }
+            })
+            .then(response => {
+                console.log(response);
+                getUnitAppointments(selectedUnit, is7DayFilterChecked);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     return (
@@ -291,9 +308,16 @@ const Dashboard = () => {
                                                 <TableCell align='center'>{dayjs(appointment.date).format('DD/MM/YYYY')}</TableCell>
                                                 <TableCell align='center'>{appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}</TableCell>
                                                 <TableCell align='center'>
-                                                    <button className='bg-red-400 py-2 px-4 rounded text-white' color="error" onClick={() => {
-                                                        console.log("CANCELAR: ", appointment.id)
-                                                    }}>Cancelar</button>
+                                                    <button
+                                                        className='bg-red-400 py-2 px-4 rounded text-white'
+                                                        color="error"
+                                                        onClick={() => {
+                                                            console.log("CANCELAR: ", appointment)
+                                                            setIsAppointmentDataLoading(true)
+                                                            handleCancelAppointment(appointment.id)
+                                                        }}>
+                                                        Cancelar
+                                                    </button>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
