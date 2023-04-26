@@ -1,13 +1,11 @@
-import UserIcon from '../assets/user-icon.svg';
-import PasswordIcon from '../assets/password-icon.svg';
-import GovBrIcon from '../assets/govbr-icon.svg';
-import { MdLogin } from 'react-icons/md';
-import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useState } from 'react';
+import { MdLogin } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { generateAccessToken, saveAccessToken } from '../utils/jwtoken.js';
-import jwt from 'jsonwebtoken';
+import GovBrIcon from '../assets/govbr-icon.svg';
+import PasswordIcon from '../assets/password-icon.svg';
+import UserIcon from '../assets/user-icon.svg';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
