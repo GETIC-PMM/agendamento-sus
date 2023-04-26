@@ -10,6 +10,7 @@ import { cpfFormatter } from '../utils/cpf-formatter';
 import Typography from '@mui/material/Typography';
 import * as dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
+import { SecretariesType } from '../routes/cidadao/AgendarAtendimento';
 
 
 interface Unidade {
@@ -52,6 +53,7 @@ const Dashboard = () => {
     const [selectedAppointmentType, setSelectedAppointmentType] = useState<number>();
     const [unitAppointmentTypes, setUnitAppointmentTypes] = useState<UnitAppointmentType[]>([]);
     const [cpfToFilter, setCpfToFilter] = useState<string>("");
+    const [appointmentSearch, setAppointmentSearch] = useState('');
 
     const [is7DayFilterChecked, setIs7DayFilterChecked] = useState<boolean>(true);
 
@@ -129,7 +131,9 @@ const Dashboard = () => {
     }
 
     const getUnitAppointmentsByCPF = async (unitId: string, cpf: string, is7DayFilterChecked: boolean) => {
-        await axios.get(`http://localhost:8000/api/appointments/byCPF/${unitId}/${cpf}`, {
+        const cpfWithoutMask = cpf.replace(/\D/g, '');
+        console.log("CPF SEM MASCARA: ", cpfWithoutMask);
+        await axios.get(`http://localhost:8000/api/appointments/byCPF/${unitId}/${cpfWithoutMask}`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get('token')}`
             }
@@ -165,7 +169,7 @@ const Dashboard = () => {
                 console.log('NAO FILTROU')
             }
 
-            console.log("APPOINTMENTS BY CPF: ", response.data.data);
+            console.log("APPOINTMENTS BY CPF: ", response);
             setIsAppointmentDataLoading(false);
         })
     }
@@ -250,6 +254,32 @@ const Dashboard = () => {
                                     onClick={() => {
                                         setIsAppointmentDataLoading(true);
                                         getUnitAppointmentsByCPF(selectedUnit, cpfToFilter, is7DayFilterChecked);
+                                    }}
+                                >
+                                    Filtrar
+                                </button>
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion>
+                        <AccordionSummary>
+                            <Typography>Filtrar por Atendimento</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <div className='flex gap-2'>
+                                <TextField
+                                    value={appointmentSearch}
+                                    onChange={(e) => {
+                                        setAppointmentSearch(e.target.value)
+                                    }}
+                                    label="Atendimento"
+                                    sx={{ width: '100%' }}
+                                />
+                                <button
+                                    className='bg-green-500 py-2 px-6 rounded text-white'
+                                    onClick={() => {
+                                        // setIsAppointmentDataLoading(true);
+                                        // getUnitAppointmentsByCPF(selectedUnit, cpfToFilter, is7DayFilterChecked);
                                     }}
                                 >
                                     Filtrar

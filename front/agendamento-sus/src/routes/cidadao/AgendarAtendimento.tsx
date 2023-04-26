@@ -29,7 +29,7 @@ interface UnidadeType {
     rua: string,
 }
 
-interface SecretariesType {
+export interface SecretariesType {
     id_unit: number,
     appointment_type_id: number,
     days: [
@@ -83,7 +83,7 @@ const AgendarAtendimento = () => {
     const citizen = {
         name: "João",
         cpf: 18467496460,
-        unit: "CLINICA QUALIFISIO"
+        unit: "CLINICA ODONTOFISIOMED"
     }
 
     const getUnits = async () => {
@@ -92,6 +92,7 @@ const AgendarAtendimento = () => {
                 'Authorization': 'Bearer ' + Cookies.get('token')
             }
         }).then(res => {
+            console.log('AQUI', res)
             setUnidade(res.data.data[0])
             console.log("/api/units/${citizen.unit}", res.data.data[0])
             getTypesInUnit(res.data.data[0].id);
@@ -119,15 +120,20 @@ const AgendarAtendimento = () => {
     }
 
     const getTypesInUnit = async (id: number) => {
-        await axios.get(`http://localhost:8000/api/secretaries/appointment_type/${id}`, {
-            headers: {
-                'Authorization': 'Bearer ' + Cookies.get('token')
-            },
-        }).then(res => {
-            console.log("UNIDADE: ", unidade)
-            console.log(`/api/secretaries/appointment_type/${id}`, res.data.data)
-            setTypesInThisUnit(res.data.data);
-        })
+        try{
+
+            await axios.get(`http://localhost:8000/api/secretaries/appointment_type/${id}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + Cookies.get('token')
+                },
+            }).then(res => {
+                console.log("UNIDADE: ", unidade)
+                console.log(`/api/secretaries/appointment_type/${id}`, res.data.data)
+                setTypesInThisUnit(res.data.data);
+            })
+        } catch (err) {
+            console.log(err)
+        }
 
     }
 
@@ -197,6 +203,7 @@ const AgendarAtendimento = () => {
         })
             .then(res => {
                 console.log(res)
+                alert("Agendamento realizado com sucesso!")
             })
             .catch(err => {
                 console.log(err)
