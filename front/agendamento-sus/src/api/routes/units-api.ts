@@ -1,28 +1,26 @@
-import axios, { AxiosResponse } from 'axios';
 import { instance } from '../instance';
+import { useMutation } from '@tanstack/react-query';
 
-export const registerUnit = async (
-  name: string,
-  open_time: string,
-  close_time: string,
-  code: number,
-  bairro: string,
-  rua: string,
-  numero: string,
-) => {
-  await instance
-    .post('api/units', {
-      name,
-      open_time,
-      close_time,
-      code,
-      bairro,
-      rua,
-      numero,
-    })
-    .then(response => response.data.data)
-    .catch(error => {
-      console.error(error);
-      throw error;
-    });
+type RegisterUnitParams = {
+  name: string;
+  open_time: string;
+  close_time: string;
+  code: number;
+  bairro: string;
+  rua: string;
+  numero: string;
+};
+
+export const useMutateRegisterUnit = () => {
+  return useMutation({
+    mutationFn: (params: RegisterUnitParams) =>
+      instance
+        .post('api/units', {
+          ...params,
+        })
+        .then(
+          response => response.data.data,
+          error => console.error(error),
+        ),
+  });
 };

@@ -1,30 +1,23 @@
+import { useMutation } from '@tanstack/react-query';
 import { instanceNoAuth } from '../instance';
 
-const registerUser = async ({
-  name,
-  email,
-  password,
-  c_password,
-}: {
+type RegisterUserParams = {
   name: string;
   email: string;
   password: string;
   c_password: string;
-}) => {
-  return await instanceNoAuth
-    .post('/api/register', {
-      name,
-      email,
-      password,
-      c_password,
-    })
-    .then(response => response.data.data)
-    .catch(error => {
-      console.error(error);
-      throw error;
-    });
 };
 
-export default {
-  registerUser,
+export const useMutateRegisterUser = () => {
+  return useMutation({
+    mutationFn: (params: RegisterUserParams) =>
+      instanceNoAuth
+        .post('/api/register', {
+          ...params,
+        })
+        .then(
+          response => response.data,
+          error => console.error(error),
+        ),
+  });
 };
