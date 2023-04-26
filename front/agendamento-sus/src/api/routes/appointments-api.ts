@@ -1,17 +1,21 @@
 import { AxiosResponse } from 'axios';
+import { Unidade } from '../../interfaces/interfaces';
 import { instance } from '../instance';
-import { Appointment } from '../../interfaces/interfaces';
+import { useQuery } from '@tanstack/react-query';
 
-const getUnitAppointmentsById = async (unitId: string) => {
-  return await instance
-    .get<AxiosResponse<Appointment[]>>(`appointments/units/${unitId}`)
-    .then(response => response.data.data)
-    .catch(error => {
-      console.error(error);
-      throw error;
-    });
-};
+export const useUnitAppointmentsById = (unitId: string) => {
+  return useQuery({
+    queryKey: ['appointments'],
+    queryFn: async () => {
+      const { data } = await instance
+        .get<AxiosResponse<Unidade>>(`appointments/units/${unitId}`)
+        .then(response => response.data)
+        .catch(error => {
+          console.error(error);
+          throw error;
+        });
 
-export default {
-  getUnitAppointmentsById,
+      return data;
+    },
+  });
 };

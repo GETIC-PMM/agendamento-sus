@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
 import { instanceNoAuth } from '../instance';
 
 const registerUser = async ({
@@ -13,7 +12,7 @@ const registerUser = async ({
   c_password: string;
 }) => {
   return await instanceNoAuth
-    .post('http://localhost:8000/api/register', {
+    .post('/api/register', {
       name,
       email,
       password,

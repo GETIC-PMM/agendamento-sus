@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { instance } from '../instance';
 
-const registerUnit = async (
+export const registerUnit = async (
   name: string,
   open_time: string,
   close_time: string,
@@ -11,7 +11,7 @@ const registerUnit = async (
   numero: string,
 ) => {
   await instance
-    .post('http://localhost:8000/api/units', {
+    .post('api/units', {
       name,
       open_time,
       close_time,
@@ -25,8 +25,4 @@ const registerUnit = async (
       console.error(error);
       throw error;
     });
-};
-
-export default {
-  registerUnit,
 };
