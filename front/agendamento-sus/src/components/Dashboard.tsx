@@ -21,14 +21,12 @@ import {
 import { cpfFormatter } from '../utils/cpf-formatter';
 import Typography from '@mui/material/Typography';
 import * as dayjs from 'dayjs';
-import appointmentsAPI from '../api/routes/appointments-api';
 import {
   Appointment,
   Unidade,
   AppointmentType,
 } from '../interfaces/interfaces';
 import { AppointmentForm } from '@devexpress/dx-react-scheduler';
-import appointmentTypeApi from '../api/routes/appointment-type-api';
 
 const Dashboard = () => {
   const [unidadeData, setUnidadeData] = useState<Unidade[]>([]);
@@ -43,151 +41,151 @@ const Dashboard = () => {
   const [isAppointmentDataLoading, setIsAppointmentDataLoading] =
     useState<boolean>(false);
 
-  const getUnitAppointments = async (
-    unitId: string,
-    is7DayFilterChecked: boolean,
-  ) => {
-    appointmentsAPI
-      .getUnitAppointmentsById(unitId)
-      .then(response => {
-        console.log('APPOINTMENTS: ', response);
-        getUnitAppointmentsType(unitId);
+  // const getUnitAppointments = async (
+  //   unitId: string,
+  //   is7DayFilterChecked: boolean,
+  // ) => {
+  //   appointmentsAPI
+  //     .getUnitAppointmentsById(unitId)
+  //     .then(response => {
+  //       console.log('APPOINTMENTS: ', response);
+  //       getUnitAppointmentsType(unitId);
 
-        //lógica para filtrar os agendamentos que estão dentro de 7 dias
-        const _response = response.map((appointment: Appointment) => {
-          const _date = dayjs(appointment.date);
-          const _today = dayjs(new Date().setHours(0, 0, 0, 0));
-          const _7daysFromToday = dayjs(new Date()).add(7, 'day');
+  //       //lógica para filtrar os agendamentos que estão dentro de 7 dias
+  //       const _response = response.map((appointment: Appointment) => {
+  //         const _date = dayjs(appointment.date);
+  //         const _today = dayjs(new Date().setHours(0, 0, 0, 0));
+  //         const _7daysFromToday = dayjs(new Date()).add(7, 'day');
 
-          if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
-            return {
-              id: appointment.id,
-              name: appointment.name,
-              date: appointment.date,
-              cpf: appointment.cpf,
-              phone_number: appointment.phone_number,
-              is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
-              appointment_type_id: appointment.appointment_type_id,
-              status: appointment.status,
-            };
-          } else {
-            return [] as Appointment[];
-          }
-        });
+  //         if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
+  //           return {
+  //             id: appointment.id,
+  //             name: appointment.name,
+  //             date: appointment.date,
+  //             cpf: appointment.cpf,
+  //             phone_number: appointment.phone_number,
+  //             is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
+  //             appointment_type_id: appointment.appointment_type_id,
+  //             status: appointment.status,
+  //           };
+  //         } else {
+  //           return [] as Appointment[];
+  //         }
+  //       });
 
-        const filteredArr = _response.filter(
-          value => value !== undefined || [],
-        );
+  //       const filteredArr = _response.filter(
+  //         value => value !== undefined || [],
+  //       );
 
-        console.log('_RESPONSE DATA AJUSTADA', filteredArr);
+  //       console.log('_RESPONSE DATA AJUSTADA', filteredArr);
 
-        if (is7DayFilterChecked) {
-          setUnitAppointments(filteredArr as Appointment[]);
-          console.log('FILTROU');
-        } else {
-          setUnitAppointments(response as Appointment[]);
-          console.log('NAO FILTROU');
-        }
+  //       if (is7DayFilterChecked) {
+  //         setUnitAppointments(filteredArr as Appointment[]);
+  //         console.log('FILTROU');
+  //       } else {
+  //         setUnitAppointments(response as Appointment[]);
+  //         console.log('NAO FILTROU');
+  //       }
 
-        setIsAppointmentDataLoading(false);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  //       setIsAppointmentDataLoading(false);
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
+  // };
 
-  const getUnitAppointmentsType = async (unitId: string) => {
-    appointmentTypeApi
-      .getUnitAppointmentsById(unitId)
-      .then(response => {
-        console.log('APPOINTMENTS TYPES: ', response);
+  // const getUnitAppointmentsType = async (unitId: string) => {
+  //   appointmentTypeApi
+  //     .getUnitAppointmentsById(unitId)
+  //     .then(response => {
+  //       console.log('APPOINTMENTS TYPES: ', response);
 
-        if (response.length === 1) {
-          const _appointmentTypes = [...unitAppointmentTypes];
-          _appointmentTypes.push(response[0]);
-          setUnitAppointmentTypes(_appointmentTypes);
-        } else {
-          setUnitAppointmentTypes(response);
-        }
+  //       if (response.length === 1) {
+  //         const _appointmentTypes = [...unitAppointmentTypes];
+  //         _appointmentTypes.push(response[0]);
+  //         setUnitAppointmentTypes(_appointmentTypes);
+  //       } else {
+  //         setUnitAppointmentTypes(response);
+  //       }
 
-        setIsAppointmentDataLoading(false);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  //       setIsAppointmentDataLoading(false);
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
+  // };
 
-  const getUnitAppointmentsByCPF = async (
-    unitId: string,
-    cpf: string,
-    is7DayFilterChecked: boolean,
-  ) => {
-    const cpfWithoutMask = cpf.replace(/\D/g, '');
-    console.log('CPF SEM MASCARA: ', cpfWithoutMask);
-    await axios
-      .get(
-        `http://localhost:8000/api/appointments/byCPF/${unitId}/${cpfWithoutMask}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get('token')}`,
-          },
-        },
-      )
-      .then(response => {
-        const _response = response.data.data.map((appointment: Appointment) => {
-          const _date = dayjs(appointment.date);
-          const _today = dayjs(new Date().setHours(0, 0, 0, 0));
-          const _7daysFromToday = dayjs(new Date()).add(7, 'day');
+  // const getUnitAppointmentsByCPF = async (
+  //   unitId: string,
+  //   cpf: string,
+  //   is7DayFilterChecked: boolean,
+  // ) => {
+  //   const cpfWithoutMask = cpf.replace(/\D/g, '');
+  //   console.log('CPF SEM MASCARA: ', cpfWithoutMask);
+  //   await axios
+  //     .get(
+  //       `http://localhost:8000/api/appointments/byCPF/${unitId}/${cpfWithoutMask}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${Cookies.get('token')}`,
+  //         },
+  //       },
+  //     )
+  //     .then(response => {
+  //       const _response = response.data.data.map((appointment: Appointment) => {
+  //         const _date = dayjs(appointment.date);
+  //         const _today = dayjs(new Date().setHours(0, 0, 0, 0));
+  //         const _7daysFromToday = dayjs(new Date()).add(7, 'day');
 
-          if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
-            return {
-              name: appointment.name,
-              date: appointment.date,
-              cpf: appointment.cpf,
-              phone_number: appointment.phone_number,
-              is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
-              appointment_type_id: appointment.appointment_type_id,
-              status: appointment.status,
-            };
-          } else {
-            return;
-          }
-        });
+  //         if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
+  //           return {
+  //             name: appointment.name,
+  //             date: appointment.date,
+  //             cpf: appointment.cpf,
+  //             phone_number: appointment.phone_number,
+  //             is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
+  //             appointment_type_id: appointment.appointment_type_id,
+  //             status: appointment.status,
+  //           };
+  //         } else {
+  //           return;
+  //         }
+  //       });
 
-        const filteredArr = _response.filter(
-          (value: Appointment) => value !== undefined,
-        );
+  //       const filteredArr = _response.filter(
+  //         (value: Appointment) => value !== undefined,
+  //       );
 
-        if (is7DayFilterChecked) {
-          setUnitAppointments(filteredArr);
-          console.log('FILTROU');
-        } else {
-          setUnitAppointments(response.data.data);
-          console.log('NAO FILTROU');
-        }
+  //       if (is7DayFilterChecked) {
+  //         setUnitAppointments(filteredArr);
+  //         console.log('FILTROU');
+  //       } else {
+  //         setUnitAppointments(response.data.data);
+  //         console.log('NAO FILTROU');
+  //       }
 
-        console.log('APPOINTMENTS BY CPF: ', response);
-        setIsAppointmentDataLoading(false);
-      });
-  };
+  //       console.log('APPOINTMENTS BY CPF: ', response);
+  //       setIsAppointmentDataLoading(false);
+  //     });
+  // };
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:8000/api/units', {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      })
-      .then(response => {
-        setUnidadeData(response.data.data);
-        console.log('UNIDADE DATA: ', response.data.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  // useEffect(() => {
+  //   axios
+  //     .get('http://localhost:8000/api/units', {
+  //       headers: {
+  //         Authorization: `Bearer ${Cookies.get('token')}`,
+  //       },
+  //     })
+  //     .then(response => {
+  //       setUnidadeData(response.data.data);
+  //       console.log('UNIDADE DATA: ', response.data.data);
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
 
-    getUnitAppointmentsType(selectedUnit);
-  }, []);
+  //   getUnitAppointmentsType(selectedUnit);
+  // }, []);
 
   const getAppointmentTypeName = (appointmentTypeId: number) => {
     // if (unitAppointmentTypes.length) {
@@ -207,21 +205,21 @@ const Dashboard = () => {
     // }
   };
 
-  const handleCancelAppointment = async (appointmentId: number) => {
-    await axios
-      .put(`http://localhost:8000/api/appointments/${appointmentId}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      })
-      .then(response => {
-        console.log(response);
-        getUnitAppointments(selectedUnit, is7DayFilterChecked);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  // const handleCancelAppointment = async (appointmentId: number) => {
+  //   await axios
+  //     .put(`http://localhost:8000/api/appointments/${appointmentId}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${Cookies.get('token')}`,
+  //       },
+  //     })
+  //     .then(response => {
+  //       console.log(response);
+  //       getUnitAppointments(selectedUnit, is7DayFilterChecked);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <div>
@@ -232,7 +230,7 @@ const Dashboard = () => {
           onChange={e => {
             setIsAppointmentDataLoading(true);
             setSelectedUnit(e.target.value);
-            getUnitAppointments(e.target.value, is7DayFilterChecked);
+            // getUnitAppointments(e.target.value, is7DayFilterChecked);
           }}
           sx={{ width: '100%' }}
         >
@@ -261,11 +259,11 @@ const Dashboard = () => {
                   className="bg-green-500 py-2 px-6 rounded text-white"
                   onClick={() => {
                     setIsAppointmentDataLoading(true);
-                    getUnitAppointmentsByCPF(
-                      selectedUnit,
-                      cpfToFilter,
-                      is7DayFilterChecked,
-                    );
+                    // getUnitAppointmentsByCPF(
+                    //   selectedUnit,
+                    //   cpfToFilter,
+                    //   is7DayFilterChecked,
+                    // );
                   }}
                 >
                   Filtrar
@@ -321,7 +319,7 @@ const Dashboard = () => {
                 onChange={event => {
                   setIsAppointmentDataLoading(true);
                   setIs7DayFilterChecked(event.target.checked);
-                  getUnitAppointments(selectedUnit, event.target.checked);
+                  // getUnitAppointments(selectedUnit, event.target.checked);
                 }}
                 defaultChecked
               />
@@ -384,7 +382,7 @@ const Dashboard = () => {
                           onClick={() => {
                             console.log('CANCELAR: ', appointment);
                             setIsAppointmentDataLoading(true);
-                            handleCancelAppointment(appointment.id);
+                            // handleCancelAppointment(appointment.id);
                           }}
                         >
                           Cancelar

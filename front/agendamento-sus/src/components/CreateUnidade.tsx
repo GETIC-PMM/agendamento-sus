@@ -3,9 +3,6 @@ import * as dayjs from 'dayjs';
 import { Autocomplete, TextField } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers';
 import { AppointmentType, UnitESUS } from '../interfaces/interfaces';
-import appointmentTypeApi from '../api/routes/appointment-type-api';
-import esusApi from '../api/routes/esus-api';
-import unitsApi from '../api/routes/units-api';
 
 interface CreateUnidadeProps {
   callback: (str: string) => void;
@@ -20,54 +17,53 @@ const CreateUnidade = (props: CreateUnidadeProps) => {
   );
   const [units, setUnits] = useState<UnitESUS[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<UnitESUS | null>(null);
-  const [, setTiposAtendimento] = useState<AppointmentType[]>([]);
   const [selectedTiposAtendimento] = useState<number>(-1);
 
-  const getTiposAntendimento = async () => {
-    appointmentTypeApi
-      .getAppointmentTypes()
-      .then(res => {
-        console.log('TIPOS DE ATENDIMENTO: ', res);
-        setTiposAtendimento(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  // const getTiposAntendimento = async () => {
+  //   appointmentTypeApi
+  //     .getAppointmentTypes()
+  //     .then(res => {
+  //       console.log('TIPOS DE ATENDIMENTO: ', res);
+  //       setTiposAtendimento(res);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // };
 
-  useEffect(() => {
-    esusApi.getEsusUnits().then(response => {
-      response.map((unit: any) => {
-        unit.label = unit.no_unidade_saude;
-      });
-      setUnits(response);
-      console.log(response);
-    });
+  // useEffect(() => {
+  //   esusApi.getEsusUnits().then(response => {
+  //     response.map((unit: any) => {
+  //       unit.label = unit.no_unidade_saude;
+  //     });
+  //     setUnits(response);
+  //     console.log(response);
+  //   });
 
-    getTiposAntendimento();
-  }, []);
+  //   getTiposAntendimento();
+  // }, []);
 
-  const handleSubmit = async () => {
-    console.log('SELECTED TIPOS ATENDIMENTO: ', selectedTiposAtendimento);
+  // const handleSubmit = async () => {
+  //   console.log('SELECTED TIPOS ATENDIMENTO: ', selectedTiposAtendimento);
 
-    unitsApi
-      .registerUnit(
-        selectedUnit!.no_unidade_saude,
-        openTime!,
-        closeTime!,
-        12131,
-        selectedUnit!.no_bairro,
-        selectedUnit!.ds_logradouro,
-        selectedUnit!.nu_numero || '0',
-      )
-      .then(res => {
-        console.log(res);
-        props.callback('unidades'); // Ir para unidades
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  //   unitsApi
+  //     .registerUnit(
+  //       selectedUnit!.no_unidade_saude,
+  //       openTime!,
+  //       closeTime!,
+  //       12131,
+  //       selectedUnit!.no_bairro,
+  //       selectedUnit!.ds_logradouro,
+  //       selectedUnit!.nu_numero || '0',
+  //     )
+  //     .then(res => {
+  //       console.log(res);
+  //       props.callback('unidades'); // Ir para unidades
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <div>
@@ -123,7 +119,7 @@ const CreateUnidade = (props: CreateUnidadeProps) => {
           className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
           onClick={e => {
             e.preventDefault();
-            handleSubmit();
+            // handleSubmit();
           }}
         >
           Cadastrar

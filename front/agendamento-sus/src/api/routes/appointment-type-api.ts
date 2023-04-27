@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { AppointmentType } from '../../interfaces/interfaces';
+import { AppointmentType, APIResponse } from '../../interfaces/interfaces';
 import { instance } from '../instance';
 
 export const useAppointmentTypes = () => {
@@ -7,7 +7,7 @@ export const useAppointmentTypes = () => {
     queryKey: ['appointmentTypes'],
     queryFn: () =>
       instance
-        .get<AppointmentType[]>('api/appointment-types')
+        .get<APIResponse<AppointmentType[]>>('api/appointment-types')
         .then(response => response.data)
         .catch(error => {
           console.error(error);
@@ -21,7 +21,7 @@ export const useUnitAppointmentsById = (unitId: string) => {
     queryKey: ['appointmentsById'],
     queryFn: () =>
       instance
-        .get<AppointmentType[]>(`/api/appointment-types/${unitId}`)
+        .get<APIResponse<AppointmentType[]>>(`/api/appointment-types/${unitId}`)
         .then(response => response.data)
         .catch(error => {
           console.error(error);

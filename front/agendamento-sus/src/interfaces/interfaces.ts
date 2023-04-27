@@ -1,3 +1,9 @@
+export type APIResponse<T> = {
+  sucess: boolean;
+  data: T;
+  message: string;
+};
+
 export interface UnitESUS {
   label: string;
   no_unidade_saude: string;
@@ -49,3 +55,13 @@ export interface Secretaries {
   days: DaysInterface[];
   unit_id: number;
 }
+
+export type Patient = {
+  co_seq_cidadao: number;
+  nu_cpf: string;
+  no_cidadao: string;
+};
+
+export type PatientUnit = {
+  no_unidade_saude: string;
+};

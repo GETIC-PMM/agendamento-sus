@@ -1,17 +1,21 @@
 import { CircularProgress, Modal } from '@mui/material';
-import axios from 'axios';
 import { useContext, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { CitizenContext } from '../../main';
 import { cpfFormatter } from '../../utils/cpf-formatter';
+import {
+  usePatientNameByCPF,
+  usePatientUnitByCPF,
+} from '../../api/routes/schedule';
 
 const Agendamento = () => {
   const [cpf, setCpf] = useState<string>('');
+  const [enabled, setEnabled] = useState(false);
   const [nomeCompleto, setNomeCompleto] = useState<string>('');
   const [unidade, setUnidade] = useState<string>('');
+
   const [cpfChecked, setCpfChecked] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [incorrectCpf, setIncorrectCpf] = useState<boolean>(false);
 
   const [modalPatientOpen, setModalPatientOpen] = useState(false);
@@ -22,46 +26,23 @@ const Agendamento = () => {
   const handleRecordOpen = () => setModalRecordOpen(true);
   const handleRecordClose = () => setModalRecordOpen(false);
 
+  const patientNameQuery = usePatientNameByCPF(cpf, enabled);
+
+  const patientUnitQuery = usePatientUnitByCPF(cpf, enabled);
+
+  const isFetching = patientNameQuery.isFetching && patientUnitQuery.isFetching;
+
+  const isSuccess = patientNameQuery.isSuccess && patientUnitQuery.isSuccess;
+
   const navigate = useNavigate();
   const citizen = useContext(CitizenContext);
 
   const handleCpfCheck = async () => {
-    setIsLoading(true);
-    setCpfChecked(false);
-    let _cpf = cpf.replace('.', '').replace('.', '').replace('-', '');
-    setIncorrectCpf(false);
-
-    if (TestaCPF(_cpf)) {
-      await axios
-        .get(`http://localhost:8000/api/patients/${_cpf}`)
-        .then(response => {
-          console.log(response.data.data);
-          setNomeCompleto(response.data.data.no_cidadao);
-          setCpfChecked(true);
-        })
-        .catch(error => {
-          console.log(error);
-          handlePatientOpen();
-          clearFields();
-        });
-
-      await axios
-        .get(`http://localhost:8000/api/patients/lastRecord/${_cpf}`)
-        .then(response => {
-          console.log(response.data.data.no_unidade_saude);
-          setUnidade(response.data.data.no_unidade_saude);
-          setCpfChecked(true);
-        })
-        .catch(error => {
-          console.log(error);
-          handleRecordOpen();
-          clearFields();
-        });
-
-      setIsLoading(false);
+    if (testaCPF(cpf)) {
+      setEnabled(true);
+      setIncorrectCpf(false);
     } else {
-      clearFields();
-      setIsLoading(false);
+      setEnabled(false);
       setIncorrectCpf(true);
     }
   };
@@ -73,26 +54,31 @@ const Agendamento = () => {
     setCpfChecked(false);
   };
 
-  function TestaCPF(strCPF: string) {
+  function testaCPF(strCPF: string) {
+    const cpfWithoutMask = strCPF
+      .replace('.', '')
+      .replace('.', '')
+      .replace('-', '');
+
     var Soma;
     var Resto;
     Soma = 0;
-    if (strCPF == '00000000000') return false;
+    if (cpfWithoutMask == '00000000000') return false;
 
     for (let i = 1; i <= 9; i++)
-      Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+      Soma = Soma + parseInt(cpfWithoutMask.substring(i - 1, i)) * (11 - i);
     Resto = (Soma * 10) % 11;
 
     if (Resto == 10 || Resto == 11) Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10))) return false;
+    if (Resto != parseInt(cpfWithoutMask.substring(9, 10))) return false;
 
     Soma = 0;
     for (let i = 1; i <= 10; i++)
-      Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+      Soma = Soma + parseInt(cpfWithoutMask.substring(i - 1, i)) * (12 - i);
     Resto = (Soma * 10) % 11;
 
     if (Resto == 10 || Resto == 11) Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11))) return false;
+    if (Resto != parseInt(cpfWithoutMask.substring(10, 11))) return false;
     return true;
   }
 
@@ -108,7 +94,7 @@ const Agendamento = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
       <div className="py-16 px-[140px] bg-primary-base flex items-center rounded-[10px] font-medium flex-col gap-7 relative">
-        {isLoading && (
+        {patientNameQuery.isFetching && (
           <CircularProgress
             color="error"
             className="absolute top-1/2 -translate-y-1/2"
@@ -201,7 +187,7 @@ const Agendamento = () => {
               className="w-full text-white h-10 pl-4 border rounded-md"
               id="nome"
               disabled
-              value={nomeCompleto}
+              value={isSuccess ? patientNameQuery.data?.data.no_cidadao : ''}
               onChange={e => {
                 setNomeCompleto(e.target.value);
               }}
@@ -217,14 +203,16 @@ const Agendamento = () => {
               className="w-full text-white h-10 pl-4 border rounded-md"
               id="unidade"
               disabled
-              value={unidade}
+              value={
+                isSuccess ? patientUnitQuery.data?.data.no_unidade_saude : ''
+              }
               onChange={e => {
                 setUnidade(e.target.value);
               }}
             />
           </div>
 
-          {cpfChecked && (
+          {isSuccess && (
             <div className="flex flex-col gap-1">
               <span className="text-white">
                 Essas informações estão corretas?

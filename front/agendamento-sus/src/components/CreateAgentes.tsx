@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, TextField } from '@mui/material';
 import * as Yup from 'yup';
-import usersAPI from '../api/routes/users-api';
+// import usersAPI from '../api/routes/users-api';
 
 const CreateAgentes = () => {
   const [name, setNome] = useState('');
@@ -23,34 +23,34 @@ const CreateAgentes = () => {
       .oneOf([Yup.ref('password')], 'Senhas devem ser iguais'),
   });
 
-  const onSubmit = async () => {
-    schema
-      .validate({ name, email, password, c_password })
-      .then(async () => {
-        await usersAPI
-          .registerUser({ name, email, password, c_password })
-          .then(response => {
-            setModalMessage('Agente cadastrado com sucesso!');
-            handleOpen();
-            setNome('');
-            setEmail('');
-            setPassword('');
-            setC_password('');
-            console.log(response);
-          })
-          .catch(error => {
-            setModalMessage(
-              'Erro ao cadastrar agente! Esse e-mail pode já estar em uso.',
-            );
-            handleOpen();
-            console.log(error);
-          });
-      })
-      .catch(error => {
-        setModalMessage(error.errors[0]);
-        handleOpen();
-      });
-  };
+  // const onSubmit = async () => {
+  //   schema
+  //     .validate({ name, email, password, c_password })
+  //     .then(async () => {
+  //       await usersAPI
+  //         .registerUser({ name, email, password, c_password })
+  //         .then(response => {
+  //           setModalMessage('Agente cadastrado com sucesso!');
+  //           handleOpen();
+  //           setNome('');
+  //           setEmail('');
+  //           setPassword('');
+  //           setC_password('');
+  //           console.log(response);
+  //         })
+  //         .catch(error => {
+  //           setModalMessage(
+  //             'Erro ao cadastrar agente! Esse e-mail pode já estar em uso.',
+  //           );
+  //           handleOpen();
+  //           console.log(error);
+  //         });
+  //     })
+  //     .catch(error => {
+  //       setModalMessage(error.errors[0]);
+  //       handleOpen();
+  //     });
+  // };
 
   return (
     <div>
@@ -77,7 +77,7 @@ const CreateAgentes = () => {
           className="flex flex-col gap-4"
           action=""
           onSubmit={() => {
-            onSubmit;
+            // onSubmit;
           }}
         >
           <div className="flex flex-col flex-1">
@@ -131,7 +131,7 @@ const CreateAgentes = () => {
             type="submit"
             onClick={e => {
               e.preventDefault();
-              onSubmit();
+              // onSubmit();
             }}
             className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
           >
