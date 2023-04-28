@@ -26,9 +26,9 @@ const Agendamento = () => {
   const handleRecordOpen = () => setModalRecordOpen(true);
   const handleRecordClose = () => setModalRecordOpen(false);
 
-  const patientNameQuery = usePatientNameByCPF(cpf, enabled);
+  const patientNameQuery = usePatientNameByCPF(cpf);
 
-  const patientUnitQuery = usePatientUnitByCPF(cpf, enabled);
+  const patientUnitQuery = usePatientUnitByCPF(cpf);
 
   const isFetching = patientNameQuery.isFetching && patientUnitQuery.isFetching;
 
@@ -39,7 +39,8 @@ const Agendamento = () => {
 
   const handleCpfCheck = async () => {
     if (testaCPF(cpf)) {
-      setEnabled(true);
+      patientNameQuery.refetch();
+      patientUnitQuery.refetch();
       setIncorrectCpf(false);
     } else {
       setEnabled(false);
@@ -94,7 +95,7 @@ const Agendamento = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
       <div className="py-16 px-[140px] bg-primary-base flex items-center rounded-[10px] font-medium flex-col gap-7 relative">
-        {patientNameQuery.isFetching && (
+        {isFetching && (
           <CircularProgress
             color="error"
             className="absolute top-1/2 -translate-y-1/2"

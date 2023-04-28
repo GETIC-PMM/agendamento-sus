@@ -1,5 +1,6 @@
-import { useMutation } from '@tanstack/react-query';
-import { instanceNoAuth } from '../instance';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { instance, instanceNoAuth } from '../instance';
+import { APIResponse, Agente } from '../../interfaces/interfaces';
 
 type RegisterUserParams = {
   name: string;
@@ -15,5 +16,19 @@ export const useMutateRegisterUser = () => {
         response => response.data,
         error => console.error(error),
       ),
+  });
+};
+
+export const useGetUsers = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () =>
+      instance
+        .get<APIResponse<Agente[]>>('/users')
+        .then(response => response.data)
+        .catch(error => {
+          console.error(error);
+          throw error;
+        }),
   });
 };

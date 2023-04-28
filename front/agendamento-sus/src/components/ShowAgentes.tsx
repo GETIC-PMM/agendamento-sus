@@ -13,15 +13,14 @@ import {
   IconButton,
   useTheme,
 } from '@mui/material';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FiSearch, FiEdit, FiTrash } from 'react-icons/fi';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import { Agente } from '../interfaces/interfaces';
+import { useGetUsers } from '../api/routes/users-api';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -38,21 +37,9 @@ const ShowAgentes = () => {
   const [loading, setLoading] = React.useState(true);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  useEffect(() => {
-    console.log(Cookies.get('token'));
-    axios
-      .get('http://localhost:8000/api/users', {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      })
-      .then(res => {
-        console.log(res.data.data);
-        setUsers(res.data.data);
-        setLoading(false);
-      });
-  }, []);
+  const usersQuery = useGetUsers();
+  const isUserFetching = usersQuery.isFetching;
+  const isUserSuccess = usersQuery.isSuccess;
 
   function TablePaginationActions(props: TablePaginationActionsProps) {
     const theme = useTheme();
@@ -140,7 +127,7 @@ const ShowAgentes = () => {
 
   return (
     <div>
-      {(loading && (
+      {(isUserFetching && (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />
         </div>
@@ -162,13 +149,7 @@ const ShowAgentes = () => {
               <TableCell align="center">Ações</TableCell>
             </TableRow>
             <TableBody>
-              {(rowsPerPage > 0
-                ? users.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage,
-                  )
-                : users
-              ).map((row: Agente) => (
+              {usersQuery.data?.data.map((row: Agente) => (
                 <TableRow
                   key={row.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

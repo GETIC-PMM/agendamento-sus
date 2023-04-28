@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { APIResponse, Patient, PatientUnit } from '../../interfaces/interfaces';
 import { instance } from '../instance';
 
-export const usePatientNameByCPF = (cpf: string, enabled: boolean) => {
+export const usePatientNameByCPF = (cpf: string) => {
   const cpfWithoutMask = cpf.replace('.', '').replace('.', '').replace('-', '');
   return useQuery({
     queryKey: ['patientNameByCPF', cpfWithoutMask],
@@ -11,11 +11,11 @@ export const usePatientNameByCPF = (cpf: string, enabled: boolean) => {
         response => response.data,
         error => console.error(error),
       ),
-    enabled,
+    enabled: false,
   });
 };
 
-export const usePatientUnitByCPF = (cpf: string, enabled: boolean) => {
+export const usePatientUnitByCPF = (cpf: string) => {
   const cpfWithoutMask = cpf.replace('.', '').replace('.', '').replace('-', '');
   return useQuery({
     queryKey: ['patientUnitByCPF', cpfWithoutMask],
@@ -26,6 +26,6 @@ export const usePatientUnitByCPF = (cpf: string, enabled: boolean) => {
           response => response.data,
           error => console.error(error),
         ),
-    enabled,
+    enabled: false,
   });
 };
