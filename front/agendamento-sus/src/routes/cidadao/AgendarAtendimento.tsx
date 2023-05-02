@@ -14,6 +14,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as dayjs from 'dayjs';
 import { cpfFormatter } from '../../utils/cpf-formatter';
 import { telFormatter } from '../../utils/tel-formatter';
+import { useAppointmentTypes } from '../../api/routes/appointment-type-api';
+import { useGetUnitByName, useGetUnits } from '../../api/routes/units-api';
+import { useUnitSecretaries } from '../../api/routes/secretaries-api';
+import { useMutateRegisterAppointment } from '../../api/routes/appointments-api';
 
 interface TiposAtendimentoType {
   id: number;
@@ -71,8 +75,6 @@ export interface SecretariesType {
 
 const AgendarAtendimento = () => {
   // const citizen = useContext(CitizenContext);
-  const [unidade, setUnidade] = useState<UnidadeType>();
-  const [unidadeTypes, setUnidadeTypes] = useState<Number[]>([]);
   const [tiposAtendimento, setTiposAtendimento] = useState<
     TiposAtendimentoType[]
   >([]);
@@ -93,66 +95,19 @@ const AgendarAtendimento = () => {
     unit: 'CLINICA ODONTOFISIOMED',
   };
 
-  const getUnits = async () => {
-    await axios
-      .get(`http://localhost:8000/api/units/${citizen.unit}`, {
-        headers: {
-          Authorization: 'Bearer ' + Cookies.get('token'),
-        },
-      })
-      .then(res => {
-        console.log('AQUI', res);
-        setUnidade(res.data.data[0]);
-        console.log('/api/units/${citizen.unit}', res.data.data[0]);
-        getTypesInUnit(res.data.data[0].id);
-        // setUnidadeTypes(res.data.data[0].appointment_type_id)
-        // const _avaliableDays = weekStringToWeekNumber(res.data.data[0].available_days);
-        // setAvaliableDays(_avaliableDays);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  const unidade = useGetUnitByName(citizen.unit);
 
-  const getTiposAntendimento = async () => {
-    await axios
-      .get('http://localhost:8000/api/appointment-types', {
-        headers: {
-          Authorization: 'Bearer ' + Cookies.get('token'),
-        },
-      })
-      .then(res => {
-        setTiposAtendimento(res.data.data);
-        console.log('/api/appointment-types', res.data.data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  const appointmentTypes = useAppointmentTypes();
 
-  const getTypesInUnit = async (id: number) => {
-    try {
-      await axios
-        .get(`http://localhost:8000/api/secretaries/appointment_type/${id}`, {
-          headers: {
-            Authorization: 'Bearer ' + Cookies.get('token'),
-          },
-        })
-        .then(res => {
-          console.log('UNIDADE: ', unidade);
-          console.log(`/api/secretaries/appointment_type/${id}`, res.data.data);
-          setTypesInThisUnit(res.data.data);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const unitAppointmentTypes = useUnitSecretaries(unidade.data?.data.id ?? 0);
 
-  const getInfos = async () => {
-    await getUnits();
-    await getTiposAntendimento();
-    setLoading(false);
-  };
+  const mutateRegisterAppointment = useMutateRegisterAppointment();
+
+  // const getInfos = async () => {
+  //   await getUnits();
+  //   await getTiposAntendimento();
+  //   setLoading(false);
+  // };
 
   const shouldDisableDate = (date: Date) => {
     const appointmentType = typesInThisUnit.find(type => {
@@ -202,7 +157,7 @@ const AgendarAtendimento = () => {
       window.location.href = '/';
     }
 
-    getInfos();
+    // getInfos();
   }, []);
 
   const handleSubmit = async () => {
@@ -214,7 +169,7 @@ const AgendarAtendimento = () => {
           name: 'joao',
           cpf: citizen.cpf,
           date: date,
-          unit_id: unidade?.id,
+          // unit_id: unidade?.id,
           status: 'pendente',
           user_id: citizen.cpf,
           phone_number: telefone,

@@ -11,20 +11,16 @@ import {
 
 const Agendamento = () => {
   const [cpf, setCpf] = useState<string>('');
-  const [enabled, setEnabled] = useState(false);
   const [nomeCompleto, setNomeCompleto] = useState<string>('');
   const [unidade, setUnidade] = useState<string>('');
 
-  const [cpfChecked, setCpfChecked] = useState<boolean>(false);
   const [incorrectCpf, setIncorrectCpf] = useState<boolean>(false);
 
+  const [modalCtrl, setModalCtrl] = useState(false);
+
   const [modalPatientOpen, setModalPatientOpen] = useState(false);
-  const handlePatientOpen = () => setModalPatientOpen(true);
-  const handlePatientClose = () => setModalPatientOpen(false);
 
   const [modalRecordOpen, setModalRecordOpen] = useState(false);
-  const handleRecordOpen = () => setModalRecordOpen(true);
-  const handleRecordClose = () => setModalRecordOpen(false);
 
   const patientNameQuery = usePatientNameByCPF(cpf);
 
@@ -34,25 +30,27 @@ const Agendamento = () => {
 
   const isSuccess = patientNameQuery.isSuccess && patientUnitQuery.isSuccess;
 
+  const isError = patientNameQuery.isError || patientUnitQuery.isError;
+
   const navigate = useNavigate();
   const citizen = useContext(CitizenContext);
 
+  if (modalCtrl && isError) {
+    setModalCtrl(false);
+    patientNameQuery.isError
+      ? setModalPatientOpen(true)
+      : patientUnitQuery.isError && setModalRecordOpen(true);
+  }
+
   const handleCpfCheck = async () => {
+    setModalCtrl(true);
     if (testaCPF(cpf)) {
       patientNameQuery.refetch();
       patientUnitQuery.refetch();
       setIncorrectCpf(false);
     } else {
-      setEnabled(false);
       setIncorrectCpf(true);
     }
-  };
-
-  const clearFields = () => {
-    setCpf('');
-    setNomeCompleto('');
-    setUnidade('');
-    setCpfChecked(false);
   };
 
   function testaCPF(strCPF: string) {
@@ -104,7 +102,10 @@ const Agendamento = () => {
 
         <Modal
           open={modalPatientOpen}
-          onClose={handlePatientClose}
+          onClose={() => {
+            setModalPatientOpen(false);
+            console.log(modalPatientOpen);
+          }}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
@@ -113,7 +114,10 @@ const Agendamento = () => {
               Paciente não encontrado no sistema. Procure sua unidade de saúde
               mais próxima.
               <button
-                onClick={handlePatientClose}
+                onClick={() => {
+                  setModalPatientOpen(false);
+                  console.log(modalPatientOpen);
+                }}
                 className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
               >
                 Fechar
@@ -124,7 +128,7 @@ const Agendamento = () => {
 
         <Modal
           open={modalRecordOpen}
-          onClose={handleRecordClose}
+          onClose={() => setModalRecordOpen(false)}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
@@ -133,7 +137,7 @@ const Agendamento = () => {
               Unidade do paciente não encontrada no sistema. Procure sua unidade
               de saúde mais próxima.
               <button
-                onClick={handleRecordClose}
+                onClick={() => setModalRecordOpen(false)}
                 className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
               >
                 Fechar

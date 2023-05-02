@@ -1,6 +1,10 @@
-import { APIResponse, Unidade } from '../../interfaces/interfaces';
+import {
+  APIResponse,
+  RegisterAppointmentParams,
+  Unidade,
+} from '../../interfaces/interfaces';
 import { instance } from '../instance';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useUnitAppointmentsById = (unitId: string) => {
   return useQuery({
@@ -10,5 +14,15 @@ export const useUnitAppointmentsById = (unitId: string) => {
         .get<APIResponse<Unidade>>(`appointments/units/${unitId}`)
         .then(response => response.data),
     enabled: false,
+  });
+};
+
+export const useMutateRegisterAppointment = () => {
+  return useMutation({
+    mutationFn: (params: RegisterAppointmentParams) =>
+      instance.post('/appointments', params).then(
+        response => response.data,
+        error => console.error(error),
+      ),
   });
 };

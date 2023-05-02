@@ -1,13 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { instance, instanceNoAuth } from '../instance';
-import { APIResponse, Agente } from '../../interfaces/interfaces';
-
-type RegisterUserParams = {
-  name: string;
-  email: string;
-  password: string;
-  c_password: string;
-};
+import {
+  APIResponse,
+  Agente,
+  RegisterUserParams,
+} from '../../interfaces/interfaces';
 
 export const useMutateRegisterUser = () => {
   return useMutation({

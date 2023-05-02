@@ -15,17 +15,3 @@ export const useAppointmentTypes = () => {
         }),
   });
 };
-
-export const useUnitAppointmentsById = (unitId: string) => {
-  return useQuery({
-    queryKey: ['appointmentsById'],
-    queryFn: () =>
-      instance
-        .get<APIResponse<AppointmentType[]>>(`/appointment-types/${unitId}`)
-        .then(response => response.data)
-        .catch(error => {
-          console.error(error);
-          throw error;
-        }),
-  });
-};

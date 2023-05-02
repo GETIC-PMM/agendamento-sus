@@ -15,6 +15,9 @@ export interface UnitESUS {
 export interface Unidade {
   id: number;
   name: string;
+  rua: string;
+  numero: string;
+  bairro: string;
   open_time: string;
   close_time: string;
 }
@@ -65,3 +68,32 @@ export type PatientUnit = {
 };
 
 export type Days = {};
+
+export type RegisterAppointmentParams = {
+  name: string;
+  cpf: string;
+  date: Date;
+  unit_id: number;
+  status: string;
+  user_id: number;
+  phone_number: string;
+  is_phone_number_whatsapp: boolean;
+  appointment_type_id: number;
+};
+
+export type RegisterUnitParams = {
+  name: string;
+  open_time: string;
+  close_time: string;
+  code: number;
+  bairro: string;
+  rua: string;
+  numero: string;
+};
+
+export type RegisterUserParams = {
+  name: string;
+  email: string;
+  password: string;
+  c_password: string;
+};

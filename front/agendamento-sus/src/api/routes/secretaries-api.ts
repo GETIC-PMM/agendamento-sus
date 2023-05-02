@@ -8,7 +8,7 @@ export const useUnitSecretaries = (unitId: number) => {
     queryFn: () =>
       instance
         .get<APIResponse<Secretaries[]>>(
-          `http://localhost:8000/api/secretaries/appointment_type/${unitId}`,
+          `/secretaries/appointment_type/${unitId}`,
         )
         .then(response => response.data)
         .catch(error => {
