@@ -7,7 +7,7 @@ export const useEsusUnits = () => {
     queryKey: ['esusUnits'],
     queryFn: () =>
       instance
-        .get<APIResponse<UnitESUS[]>>('/api/units/esus')
+        .get<APIResponse<UnitESUS[]>>('/units/esus')
         .then(response => response.data)
         .catch(error => {
           console.error(error);

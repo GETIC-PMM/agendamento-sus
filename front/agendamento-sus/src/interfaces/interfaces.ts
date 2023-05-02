@@ -17,8 +17,6 @@ export interface Unidade {
   name: string;
   open_time: string;
   close_time: string;
-  appointment_quantity: number;
-  available_days: string[];
 }
 
 export interface Appointment {
@@ -65,3 +63,5 @@ export type Patient = {
 export type PatientUnit = {
   no_unidade_saude: string;
 };
+
+export type Days = {};

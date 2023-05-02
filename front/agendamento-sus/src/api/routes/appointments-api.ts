@@ -9,5 +9,6 @@ export const useUnitAppointmentsById = (unitId: string) => {
       instance
         .get<APIResponse<Unidade>>(`appointments/units/${unitId}`)
         .then(response => response.data),
+    enabled: false,
   });
 };

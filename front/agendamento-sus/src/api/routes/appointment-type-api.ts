@@ -7,7 +7,7 @@ export const useAppointmentTypes = () => {
     queryKey: ['appointmentTypes'],
     queryFn: () =>
       instance
-        .get<APIResponse<AppointmentType[]>>('api/appointment-types')
+        .get<APIResponse<AppointmentType[]>>('/appointment-types')
         .then(response => response.data)
         .catch(error => {
           console.error(error);
@@ -21,7 +21,7 @@ export const useUnitAppointmentsById = (unitId: string) => {
     queryKey: ['appointmentsById'],
     queryFn: () =>
       instance
-        .get<APIResponse<AppointmentType[]>>(`/api/appointment-types/${unitId}`)
+        .get<APIResponse<AppointmentType[]>>(`/appointment-types/${unitId}`)
         .then(response => response.data)
         .catch(error => {
           console.error(error);
