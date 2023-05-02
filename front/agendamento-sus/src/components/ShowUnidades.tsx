@@ -8,12 +8,13 @@ import Paper from '@mui/material/Paper';
 import Modal from '@mui/material/Modal';
 import { useGetUnits } from '../api/routes/units-api';
 import { FiEdit, FiTrash } from 'react-icons/fi';
-import { CircularProgress, TextField } from '@mui/material';
+import { CircularProgress, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { weekdaysTranslation } from '../utils/consts';
 import * as dayjs from 'dayjs';
 import { Unidade } from '../interfaces/interfaces';
 import { useUnitSecretaries } from '../api/routes/secretaries-api';
+import { blue } from '@mui/material/colors';
 
 const ShowUnidades = () => {
   const { data: units, isLoading: unitsIsLoading } = useGetUnits();
@@ -21,7 +22,9 @@ const ShowUnidades = () => {
 
   const opened = editUnit !== null;
 
-  const onClose = () => setEditUnit(null);
+  const onClose = () => {
+    setEditUnit(null);
+  };
 
   return (
     <div>
@@ -106,8 +109,15 @@ const EditModal = ({ unit, opened, onClose }: EditModalProps) => {
     }),
   );
 
-  const { data: unitSecretaries, isLoading: unitsIsLoading } =
-    useUnitSecretaries(unit?.id ?? 0);
+  const {
+    data: unitSecretaries,
+    isLoading: unitsIsLoading,
+    isFetching: unitSecretariesIsFetching,
+  } = useUnitSecretaries(unit?.id ?? 0);
+
+  unitSecretaries
+    ? console.log(unitSecretaries.data)
+    : console.log('nada ainda');
 
   return (
     <div className="flex items-center justify-center">
@@ -115,16 +125,64 @@ const EditModal = ({ unit, opened, onClose }: EditModalProps) => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          position: 'absolute',
+          top: '10%',
+          left: '10%',
           overflowY: 'scroll',
+          width: '75%',
+          height: '75%',
         }}
         open={opened}
         onClose={onClose}
       >
-        <Paper sx={{ padding: '20px' }}>
-          <TextField>{unit?.name}</TextField>
+        <Paper
+          sx={{
+            padding: '42px',
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
+          <TextField value={unit?.name} disabled sx={{ width: '100%' }} />
+          <div className="w-full">
+            <Typography variant="h6" align="center">
+              Atendimentos da unidade
+            </Typography>
+            {unitSecretariesIsFetching ? (
+              <CircularProgress />
+            ) : (
+              unitSecretaries?.data.map((secretarie, index) => {
+                return (
+                  <>
+                    <Typography variant="body1" color={'blue'}>
+                      {secretarie.appointment_type_id}
+                    </Typography>
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Dia da semana</TableCell>
+                            <TableCell>Vagas</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {secretarie.days.map(day => {
+                            return (
+                              <TableRow>
+                                <TableCell>{day.day}</TableCell>
+                                <TableCell>{day.slots}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </>
+                );
+              })
+            )}
+          </div>
           <Table>
             <TableHead>
               <TableRow>
