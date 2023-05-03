@@ -67,8 +67,6 @@ export type PatientUnit = {
   no_unidade_saude: string;
 };
 
-export type Days = {};
-
 export type RegisterAppointmentParams = {
   name: string;
   cpf: string;
@@ -113,4 +111,15 @@ export type RegisterParams = {
 export type LoginResponse = {
   name: 'string';
   token: 'string';
+};
+
+type Days = {
+  day: string;
+  slots: number;
+};
+
+export type RegisterSecretarieParams = {
+  unit_id: number;
+  appointment_type_id: number;
+  days: Days[];
 };

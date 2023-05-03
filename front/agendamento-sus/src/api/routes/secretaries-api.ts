@@ -1,6 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { instance } from '../instance';
-import { APIResponse, Secretaries } from '../../interfaces/interfaces';
+import {
+  APIResponse,
+  RegisterSecretarieParams,
+  Secretaries,
+} from '../../interfaces/interfaces';
 
 export const useUnitSecretaries = (unitId: number) => {
   return useQuery({
@@ -15,5 +19,15 @@ export const useUnitSecretaries = (unitId: number) => {
           console.error(error);
           throw error;
         }),
+  });
+};
+
+export const useMutateRegisterSecretarie = () => {
+  return useMutation({
+    mutationFn: (params: RegisterSecretarieParams) =>
+      instance.post('/secretaries', params).then(
+        response => response.data,
+        error => console.error(error),
+      ),
   });
 };
