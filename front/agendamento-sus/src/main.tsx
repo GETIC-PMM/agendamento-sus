@@ -42,9 +42,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <QueryClientProvider client={queryClient}>
     <CitizenContext.Provider value={citizen}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <React.StrictMode>
-          <RouterProvider router={router} />
-        </React.StrictMode>
+        <RouterProvider router={router} />
       </LocalizationProvider>
     </CitizenContext.Provider>
   </QueryClientProvider>,

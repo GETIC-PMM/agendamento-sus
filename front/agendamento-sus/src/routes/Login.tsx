@@ -6,45 +6,24 @@ import { useNavigate } from 'react-router-dom';
 import GovBrIcon from '../assets/govbr-icon.svg';
 import PasswordIcon from '../assets/password-icon.svg';
 import UserIcon from '../assets/user-icon.svg';
+import { useLogin, useRegister } from '../api/routes/auth';
 
 const Login = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const criarUser = () => {
-    axios
-      .post('http://localhost:8000/api/register', {
-        name: 'jorge',
-        email: 'jorge@email.com',
-        password: 'admin',
-        c_password: 'admin',
-      })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  const register = useRegister();
+
+  const login = useLogin({
+    onSuccess: data => {
+      const expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + 1000 * 60);
+      Cookies.set('token', data, { expires: expireDate });
+      navigate('/admin/dashboard');
+    },
+  });
 
   const navigate = useNavigate();
-
-  const handleLogin = () => {
-    axios
-      .post('http://localhost:8000/api/login', {
-        email,
-        password,
-      })
-      .then(response => {
-        const expireDate = new Date();
-        expireDate.setDate(expireDate.getDate() + 1000 * 60);
-        Cookies.set('token', response.data.data.token, { expires: expireDate });
-        navigate('/admin/dashboard');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
@@ -76,7 +55,7 @@ const Login = () => {
             type="submit"
             onClick={e => {
               e.preventDefault();
-              handleLogin();
+              login.mutate({ email, password });
             }}
             className="bg-primary-dark rounded-full w-[420px] py-3 h-full px-6 relative"
           >
@@ -115,7 +94,12 @@ const Login = () => {
           </span>
         </button>
 
-        <button onClick={criarUser}>Criar</button>
+        <button
+        // TODO: fazer a pagina de registrar e usar o mutate
+        // onClick={() => register.mutate()}
+        >
+          Criar
+        </button>
       </div>
     </div>
   );

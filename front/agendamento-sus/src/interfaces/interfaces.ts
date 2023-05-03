@@ -97,3 +97,20 @@ export type RegisterUserParams = {
   password: string;
   c_password: string;
 };
+
+export type LoginParams = {
+  email: string;
+  password: string;
+};
+
+export type RegisterParams = {
+  name: string;
+  email: string;
+  password: string;
+  c_password: string;
+};
+
+export type LoginResponse = {
+  name: 'string';
+  token: 'string';
+};
