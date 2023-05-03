@@ -12,15 +12,14 @@ import { Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { weekdaysTranslation } from '../utils/consts';
 import * as dayjs from 'dayjs';
-import { AppointmentType, Unidade } from '../interfaces/interfaces';
+import { Unidade } from '../interfaces/interfaces';
 import {
   useMutateRegisterSecretarie,
   useUnitSecretaries,
 } from '../api/routes/secretaries-api';
 import { useAppointmentTypes } from '../api/routes/appointment-type-api';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { create } from 'domain';
+import Select from '@mui/material/Select';
 
 const ShowUnidades = () => {
   const { data: units, isLoading: unitsIsLoading } = useGetUnits();
@@ -46,10 +45,6 @@ const ShowUnidades = () => {
   const createSecretarie = useMutateRegisterSecretarie();
 
   const onSubmit = () => {
-    console.log('Trying to submit');
-    console.log('UNIT_ID: ', editUnit!.id);
-    console.log('APPOINTMENT_TYPE: ', selectedAppointmentType);
-    console.log('DAYS: ', weekday);
     createSecretarie.mutate({
       unit_id: editUnit!.id,
       appointment_type_id: selectedAppointmentType!,
@@ -246,7 +241,7 @@ const EditModal = ({
                   return (
                     <>
                       <Typography variant="body1" color={'blue'}>
-                        {secretarie.appointment_type_id}
+                        {secretarie.name}
                       </Typography>
                       <TableContainer component={Paper}>
                         <Table>
