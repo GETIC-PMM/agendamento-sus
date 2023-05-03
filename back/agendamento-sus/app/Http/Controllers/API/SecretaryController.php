@@ -84,7 +84,7 @@ class SecretaryController extends BaseController
     public function listAppointmentsFromUnit(int $unit_id)
     {
         $list = Secretary::where('unit_id', $unit_id)->leftJoin('appointment_types', 'secretaries.appointment_type_id', '=', 'appointment_types.id')
-            ->select('secretaries.unit_id', 'appointment_types.name', 'secretaries.days')
+            ->select('secretaries.unit_id', 'appointment_types.id as appointment_type_id', 'appointment_types.name as appointment_type_name', 'secretaries.days')
             ->get();
 
         if (is_null($list)) {
