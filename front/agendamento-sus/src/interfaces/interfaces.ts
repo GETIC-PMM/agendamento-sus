@@ -53,6 +53,7 @@ export interface DaysInterface {
 
 export interface Secretaries {
   appointment_type_id: number;
+  name: string;
   days: DaysInterface[];
   unit_id: number;
 }
