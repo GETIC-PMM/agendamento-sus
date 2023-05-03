@@ -1,4 +1,5 @@
-{/* <div className='mt-6'>
+{
+  /* <div className='mt-6'>
                     <h1 className='font-bold'>Adicionar tipos de atendimento</h1>
                     <div className='flex gap-2'>
                         <Select
@@ -103,4 +104,5 @@
                             </div>
                         )
                     })}
-                </div> */}
+                </div> */
+}
