@@ -176,6 +176,17 @@ class AppointmentController extends BaseController
         return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
     }
 
+    public function searchByAppointmentType(int $unit_id, int $appointment_type_id)
+    {
+        $appointments = Appointment::where('unit_id', $unit_id)->where('appointment_type_id', $appointment_type_id)->get();
+
+        if (is_null($appointments)) {
+            return $this->sendError('Appointment not found.');
+        }
+
+        return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
+    }
+
     public function checkSlots(string $unit, string $appointment, string $date)
     {
         $dotw = Carbon::parse($date)->dayOfWeek;
@@ -190,7 +201,7 @@ class AppointmentController extends BaseController
         }
 
         if ($appointments >= $slots)
-            return $this->sendResponse($slots, 'Appointments verified successfully.');
+            return $this->sendResponse(false, 'Appointments verified successfully.');
         else
             return $this->sendResponse(true, 'Appointments verified successfully.');
     }
@@ -208,13 +219,13 @@ class AppointmentController extends BaseController
     public function translateDate($day)
     {
         $translate = [
-            '0' => 'Segunda',
-            '1' => 'Terça',
-            '2' => 'Quarta',
-            '3' => 'Quinta',
-            '4' => 'Sexta',
-            '5' => 'Sábado',
-            '6' => 'Domingo',
+            '1' => 'Segunda',
+            '2' => 'Terça',
+            '3' => 'Quarta',
+            '4' => 'Quinta',
+            '5' => 'Sexta',
+            '6' => 'Sábado',
+            '0' => 'Domingo',
         ];
 
         $translated = $translate[$day];
