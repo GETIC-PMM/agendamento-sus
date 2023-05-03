@@ -51,6 +51,8 @@ Route::controller(AppointmentController::class)->group(function () {
     Route::post('appointments', 'store')->name('appointments.store');
 });
 
+Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('units', UnitController::class);
     Route::controller(AppointmentTypeController::class)->group(function () {
@@ -67,7 +69,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('secretaries/{unit_id}/{appointment_type_id}', 'destroy')->name('secretaries.destroy');
 
         Route::get('secretaries/by-unit/{unit_id}', [SecretaryController::class, 'getAppointmentsByUnit'])->name('secretaries.get-appointments-by-unit');
-        Route::get('secretaries/appointment_type/{unit_id}', [SecretaryController::class, 'listAppointmentsFromUnit'])->name('secretaries.list-appointments-unit');
         Route::get('secretaries/{unit_id}/{appointment_type_id}', [SecretaryController::class, 'search'])->name('secretaries.search');
     });
 
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('appointments', 'index')->name('appointments.index');
         Route::get('appointments/byCPF/{unit_id}/{cpf}', 'searchByCPF')->name('search.by-cpf');
         Route::get('appointments/byDate/{unit_id}/{date}', 'searchByDate')->name('search.by-date');
+        Route::get('appointments/byAppointmentType/{unit_id}/{appointment_type_id}', 'searchByAppointmentType')->name('search.by-appointment-type');
         Route::get('appointments/{id}', 'show')->name('appointments.show');
         Route::put('appointments/{id}', 'cancelAppointment')->name('appointments.cancel-appintment');
         Route::delete('appointments/{id}', 'destroy')->name('appointments.destroy');
