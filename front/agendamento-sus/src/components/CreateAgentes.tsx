@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, TextField } from '@mui/material';
 import * as Yup from 'yup';
+import { useMutateRegisterUser } from '../api/routes/users-api';
 // import usersAPI from '../api/routes/users-api';
 
 const CreateAgentes = () => {
@@ -23,34 +24,29 @@ const CreateAgentes = () => {
       .oneOf([Yup.ref('password')], 'Senhas devem ser iguais'),
   });
 
-  // const onSubmit = async () => {
-  //   schema
-  //     .validate({ name, email, password, c_password })
-  //     .then(async () => {
-  //       await usersAPI
-  //         .registerUser({ name, email, password, c_password })
-  //         .then(response => {
-  //           setModalMessage('Agente cadastrado com sucesso!');
-  //           handleOpen();
-  //           setNome('');
-  //           setEmail('');
-  //           setPassword('');
-  //           setC_password('');
-  //           console.log(response);
-  //         })
-  //         .catch(error => {
-  //           setModalMessage(
-  //             'Erro ao cadastrar agente! Esse e-mail pode já estar em uso.',
-  //           );
-  //           handleOpen();
-  //           console.log(error);
-  //         });
-  //     })
-  //     .catch(error => {
-  //       setModalMessage(error.errors[0]);
-  //       handleOpen();
-  //     });
-  // };
+  const createUser = useMutateRegisterUser();
+
+  const clearInputs = () => {
+    setNome('');
+    setEmail('');
+    setPassword('');
+    setC_password('');
+  };
+
+  const onSubmit = async () => {
+    createUser.mutate({
+      name,
+      email,
+      password,
+      c_password,
+    });
+
+    if (createUser.isSuccess) {
+      setModalMessage('Usuário cadastrado com sucesso!');
+      handleOpen();
+      clearInputs();
+    }
+  };
 
   return (
     <div>
@@ -73,13 +69,7 @@ const CreateAgentes = () => {
         </div>
       </Modal>
       <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6 drop-shadow">
-        <form
-          className="flex flex-col gap-4"
-          action=""
-          onSubmit={() => {
-            // onSubmit;
-          }}
-        >
+        <form className="flex flex-col gap-4" action="">
           <div className="flex flex-col flex-1">
             <TextField
               type="text"
@@ -131,7 +121,7 @@ const CreateAgentes = () => {
             type="submit"
             onClick={e => {
               e.preventDefault();
-              // onSubmit();
+              onSubmit();
             }}
             className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
           >

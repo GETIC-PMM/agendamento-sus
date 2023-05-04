@@ -8,27 +8,76 @@ import Paper from '@mui/material/Paper';
 import Modal from '@mui/material/Modal';
 import { useGetUnits } from '../api/routes/units-api';
 import { FiEdit, FiTrash } from 'react-icons/fi';
-import { CircularProgress, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Button, CircularProgress, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
 import { weekdaysTranslation } from '../utils/consts';
 import * as dayjs from 'dayjs';
 import { Unidade } from '../interfaces/interfaces';
-import { useUnitSecretaries } from '../api/routes/secretaries-api';
-import { blue } from '@mui/material/colors';
+import {
+  useMutateRegisterSecretarie,
+  useUnitSecretaries,
+} from '../api/routes/secretaries-api';
+import { useAppointmentTypes } from '../api/routes/appointment-type-api';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 const ShowUnidades = () => {
   const { data: units, isLoading: unitsIsLoading } = useGetUnits();
+
   const [editUnit, setEditUnit] = useState<Unidade | null>(null);
+
+  const [selectedAppointmentType, setSelectedAppointmentType] = useState<
+    number | null
+  >(null);
 
   const opened = editUnit !== null;
 
+  const [weekday, setWeekday] = useState(
+    Object.values(weekdaysTranslation).map(weekday => {
+      return {
+        day: weekday,
+        slots: 0,
+        checked: false,
+      };
+    }),
+  );
+
+  const createSecretarie = useMutateRegisterSecretarie();
+
+  const onSubmit = () => {
+    createSecretarie.mutate({
+      unit_id: editUnit!.id,
+      appointment_type_id: selectedAppointmentType!,
+      days: weekday,
+    });
+  };
+
   const onClose = () => {
     setEditUnit(null);
+    setWeekday(
+      Object.values(weekdaysTranslation).map(weekday => {
+        return {
+          day: weekday,
+          slots: 0,
+          checked: false,
+        };
+      }),
+    );
+    setSelectedAppointmentType(null);
   };
 
   return (
     <div>
-      <EditModal opened={opened} onClose={onClose} unit={editUnit} />
+      <EditModal
+        opened={opened}
+        onClose={onClose}
+        unit={editUnit}
+        weekday={weekday}
+        setWeekday={setWeekday}
+        selectedAppointmentType={selectedAppointmentType}
+        setSelectedAppointmentType={setSelectedAppointmentType}
+        onSubmit={onSubmit}
+      />
       {unitsIsLoading ? (
         <CircularProgress />
       ) : (
@@ -96,23 +145,58 @@ type EditModalProps = {
   unit: Unidade | null;
   opened: boolean;
   onClose: () => void;
+  weekday: {
+    day:
+      | 'Domingo'
+      | 'Segunda'
+      | 'Terça'
+      | 'Quarta'
+      | 'Quinta'
+      | 'Sexta'
+      | 'Sábado';
+    slots: number;
+    checked: boolean;
+  }[];
+  setWeekday: React.Dispatch<
+    React.SetStateAction<
+      {
+        day:
+          | 'Domingo'
+          | 'Segunda'
+          | 'Terça'
+          | 'Quarta'
+          | 'Quinta'
+          | 'Sexta'
+          | 'Sábado';
+        slots: number;
+        checked: boolean;
+      }[]
+    >
+  >;
+  selectedAppointmentType: number | null;
+  setSelectedAppointmentType: React.Dispatch<
+    React.SetStateAction<number | null>
+  >;
+  onSubmit: () => void;
 };
 
-const EditModal = ({ unit, opened, onClose }: EditModalProps) => {
-  const [weekday, setWeekday] = useState(
-    Object.values(weekdaysTranslation).map(weekday => {
-      return {
-        day: weekday,
-        slots: 0,
-        checked: false,
-      };
-    }),
-  );
+const EditModal = ({
+  unit,
+  opened,
+  onClose,
+  weekday,
+  setWeekday,
+  selectedAppointmentType,
+  setSelectedAppointmentType,
+  onSubmit,
+}: EditModalProps) => {
+  const { data: appointmentTypes, isLoading: appointmentTypesIsLoading } =
+    useAppointmentTypes();
 
   const {
     data: unitSecretaries,
     isLoading: unitsIsLoading,
-    isFetching: unitSecretariesIsFetching,
+    isSuccess: unitSecretariesIsSuccess,
   } = useUnitSecretaries(unit?.id ?? 0);
 
   unitSecretaries
@@ -121,106 +205,171 @@ const EditModal = ({ unit, opened, onClose }: EditModalProps) => {
 
   return (
     <div className="flex items-center justify-center">
-      <Modal
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{
-          position: 'absolute',
-          top: '10%',
-          left: '10%',
-          overflowY: 'scroll',
-          width: '75%',
-          height: '75%',
-        }}
-        open={opened}
-        onClose={onClose}
-      >
-        <Paper
+      {unitSecretariesIsSuccess && (
+        <Modal
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
           sx={{
-            padding: '42px',
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'column',
-            gap: '24px',
+            position: 'absolute',
+            top: '10%',
+            left: '10%',
+            overflowY: 'scroll',
+            width: '75%',
+            height: '75%',
           }}
+          open={opened}
+          onClose={onClose}
         >
-          <TextField value={unit?.name} disabled sx={{ width: '100%' }} />
-          <div className="w-full">
+          <Paper
+            sx={{
+              padding: '42px',
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+              gap: '24px',
+            }}
+          >
+            <TextField value={unit?.name} disabled sx={{ width: '100%' }} />
+            <div className="w-full">
+              <Typography variant="h6" align="center">
+                Atendimentos da unidade
+              </Typography>
+              {unitsIsLoading ? (
+                <CircularProgress />
+              ) : (
+                unitSecretaries?.data.map((secretarie, index) => {
+                  return (
+                    <>
+                      <Typography variant="body1" color={'blue'}>
+                        {secretarie.name}
+                      </Typography>
+                      <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Dia da semana</TableCell>
+                              <TableCell>Vagas</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {secretarie.days.map(day => {
+                              return (
+                                <TableRow>
+                                  <TableCell>{day.day}</TableCell>
+                                  <TableCell>{day.slots}</TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </>
+                  );
+                })
+              )}
+            </div>
             <Typography variant="h6" align="center">
-              Atendimentos da unidade
+              Adicionar novo atendimento
             </Typography>
-            {unitSecretariesIsFetching ? (
-              <CircularProgress />
-            ) : (
-              unitSecretaries?.data.map((secretarie, index) => {
+            <Select
+              value={selectedAppointmentType}
+              onChange={e => {
+                setSelectedAppointmentType(e.target.value as number);
+              }}
+              sx={{ width: '100%' }}
+            >
+              {appointmentTypes?.data.map(appointmentType => {
                 return (
-                  <>
-                    <Typography variant="body1" color={'blue'}>
-                      {secretarie.appointment_type_id}
-                    </Typography>
-                    <TableContainer component={Paper}>
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Dia da semana</TableCell>
-                            <TableCell>Vagas</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {secretarie.days.map(day => {
-                            return (
-                              <TableRow>
-                                <TableCell>{day.day}</TableCell>
-                                <TableCell>{day.slots}</TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </>
-                );
-              })
-            )}
-          </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Dia da semana</TableCell>
-                <TableCell>Vagas</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {weekday.map(day => {
-                return (
-                  <TableRow>
-                    <TableCell>{day.day}</TableCell>
-                    <TableCell>
-                      <TextField
-                        type="number"
-                        value={day.slots}
-                        onChange={e => {
-                          setWeekday(
-                            weekday.map(weekday => {
-                              if (weekday.day === day.day) {
-                                return {
-                                  ...weekday,
-                                  slots: parseInt(e.target.value),
-                                };
-                              }
-                              return weekday;
-                            }),
-                          );
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
+                  <MenuItem value={appointmentType.id}>
+                    {appointmentType.name}
+                  </MenuItem>
                 );
               })}
-            </TableBody>
-          </Table>
-        </Paper>
-      </Modal>
+            </Select>
+
+            {selectedAppointmentType && (
+              <>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Dia da semana</TableCell>
+                        <TableCell>Vagas</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {weekday.map(day => {
+                        return (
+                          <TableRow>
+                            <TableCell>{day.day}</TableCell>
+                            <TableCell>
+                              <TextField
+                                type="number"
+                                value={day.slots}
+                                onChange={e => {
+                                  setWeekday(
+                                    weekday.map(weekday => {
+                                      if (weekday.day === day.day) {
+                                        return {
+                                          ...weekday,
+                                          slots: parseInt(e.target.value),
+                                        };
+                                      }
+                                      return weekday;
+                                    }),
+                                  );
+                                }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Button onClick={onSubmit}>Criar atendimento</Button>
+              </>
+            )}
+
+            {/* <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Dia da semana</TableCell>
+                  <TableCell>Vagas</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {weekday.map(day => {
+                  return (
+                    <TableRow>
+                      <TableCell>{day.day}</TableCell>
+                      <TableCell>
+                        <TextField
+                          type="number"
+                          value={day.slots}
+                          onChange={e => {
+                            setWeekday(
+                              weekday.map(weekday => {
+                                if (weekday.day === day.day) {
+                                  return {
+                                    ...weekday,
+                                    slots: parseInt(e.target.value),
+                                  };
+                                }
+                                return weekday;
+                              }),
+                            );
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table> */}
+          </Paper>
+        </Modal>
+      )}
     </div>
   );
 };
