@@ -11,7 +11,7 @@ import TipoAtendimento from '../components/TipoAtendimento';
 import Dashboard from '../components/Dashboard';
 
 const Homepage = () => {
-  const [activeSidebar, setActiveSidebar] = useState('');
+  const [activeSidebar, setActiveSidebar] = useState('unidades');
   const [sidebarIsVisible, setSidebarIsVisible] = useState(true);
   const [editId, setEditId] = useState(-1);
 

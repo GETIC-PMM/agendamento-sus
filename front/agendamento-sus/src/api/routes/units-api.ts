@@ -6,13 +6,18 @@ import {
 import { instance } from '../instance';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-export const useMutateRegisterUnit = () => {
+export const useMutateRegisterUnit = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) => {
   return useMutation({
     mutationFn: (params: RegisterUnitParams) =>
       instance.post('/units', params).then(
         response => response.data.data,
         error => console.error(error),
       ),
+    onSuccess,
   });
 };
 
@@ -30,17 +35,23 @@ export const useGetUnits = () => {
   });
 };
 
-export const useGetUnitByName = (unit: string) => {
+export const useGetUnitByName = ({
+  unit,
+  onSuccess,
+}: {
+  unit: string;
+  onSuccess?: (data: APIResponse<Unidade[]>) => void;
+}) => {
   return useQuery({
-    queryKey: ['units'],
+    queryKey: ['unit', unit],
     queryFn: () =>
       instance
-        .get<APIResponse<Unidade>>(`/units/${unit}`)
+        .get<APIResponse<Unidade[]>>(`/units/${unit}`)
         .then(response => response.data)
         .catch(error => {
           console.error(error);
           throw error;
         }),
-    enabled: false,
+    onSuccess,
   });
 };

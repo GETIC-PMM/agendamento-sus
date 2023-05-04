@@ -6,36 +6,21 @@ import {
   TextField,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as dayjs from 'dayjs';
 import { cpfFormatter } from '../../utils/cpf-formatter';
 import { telFormatter } from '../../utils/tel-formatter';
-import { useAppointmentTypes } from '../../api/routes/appointment-type-api';
-import { useGetUnitByName, useGetUnits } from '../../api/routes/units-api';
+import { useGetUnitByName } from '../../api/routes/units-api';
 import { useUnitSecretaries } from '../../api/routes/secretaries-api';
 import { useMutateRegisterAppointment } from '../../api/routes/appointments-api';
+import { useNavigate } from 'react-router-dom';
 
 interface TiposAtendimentoType {
   id: number;
   name: string;
   duration: number;
-}
-
-interface UnidadeType {
-  appointment_quantity: number;
-  appointment_type_id: number[];
-  available_days: string[];
-  bairro: string;
-  close_time: string;
-  id: number;
-  name: string;
-  numero: string;
-  open_time: string;
-  rua: string;
 }
 
 export interface SecretariesType {
@@ -74,16 +59,17 @@ export interface SecretariesType {
 }
 
 const AgendarAtendimento = () => {
+  const navigate = useNavigate();
+
   // const citizen = useContext(CitizenContext);
   const [tiposAtendimento, setTiposAtendimento] = useState<
     TiposAtendimentoType[]
   >([]);
   const [typesInThisUnit, setTypesInThisUnit] = useState<SecretariesType[]>([]);
   const [avaliableDays, setAvaliableDays] = useState<Number[]>([]);
-  const [user, setUser] = useState({});
-  const [loading, setLoading] = useState<boolean>(true);
   const [telefone, setTelefone] = useState<string>('');
   const [isWhatsapp, setIsWhatsapp] = useState<string>('');
+  const [unitId, setUnitId] = useState<number | null>(null);
 
   const [date, setDate] = useState<Date>(dayjs(new Date()).toDate());
 
@@ -91,118 +77,74 @@ const AgendarAtendimento = () => {
 
   const citizen = {
     name: 'João',
-    cpf: 18467496460,
+    cpf: '18467496460',
     unit: 'CLINICA ODONTOFISIOMED',
   };
 
-  const unidade = useGetUnitByName(citizen.unit);
+  const unidade = useGetUnitByName({
+    unit: citizen.unit,
+    onSuccess: data => {
+      setUnitId(data.data[0].id);
+    },
+  });
 
-  const appointmentTypes = useAppointmentTypes();
+  const unitAppointmentTypes = useUnitSecretaries({
+    unitId: unitId,
+  });
 
-  const unitAppointmentTypes = useUnitSecretaries(unidade.data?.data.id ?? 0);
+  const registerAppointment = useMutateRegisterAppointment({
+    onSuccess: () => {
+      alert('Agendamento realizado com sucesso!');
+      navigate('/');
+    },
+  });
 
-  const mutateRegisterAppointment = useMutateRegisterAppointment();
+  // const shouldDisableDate = (date: Date) => {
+  //   const appointmentType = typesInThisUnit.find(type => {
+  //     return type.appointment_type_id.toString() === selectedType;
+  //   }) as SecretariesType;
 
-  // const getInfos = async () => {
-  //   await getUnits();
-  //   await getTiposAntendimento();
-  //   setLoading(false);
+  //   const _day = dayjs(date).day();
+
+  //   let resultDate;
+  //   if (_day === 0) {
+  //     appointmentType?.days[0].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 1) {
+  //     appointmentType?.days[1].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 2) {
+  //     appointmentType?.days[2].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 3) {
+  //     appointmentType?.days[3].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 4) {
+  //     appointmentType?.days[4].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 5) {
+  //     appointmentType?.days[5].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else if (_day === 6) {
+  //     appointmentType?.days[6].slots === 0
+  //       ? (resultDate = true)
+  //       : (resultDate = false);
+  //   } else {
+  //     resultDate = false;
+  //   }
+
+  //   return resultDate;
   // };
-
-  const shouldDisableDate = (date: Date) => {
-    const appointmentType = typesInThisUnit.find(type => {
-      return type.appointment_type_id.toString() === selectedType;
-    }) as SecretariesType;
-
-    const _day = dayjs(date).day();
-
-    let resultDate;
-    if (_day === 0) {
-      appointmentType?.days[0].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 1) {
-      appointmentType?.days[1].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 2) {
-      appointmentType?.days[2].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 3) {
-      appointmentType?.days[3].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 4) {
-      appointmentType?.days[4].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 5) {
-      appointmentType?.days[5].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else if (_day === 6) {
-      appointmentType?.days[6].slots === 0
-        ? (resultDate = true)
-        : (resultDate = false);
-    } else {
-      resultDate = false;
-    }
-
-    return resultDate;
-  };
-
-  useEffect(() => {
-    if (citizen?.name === '' || citizen?.cpf === 0 || citizen?.unit === '') {
-      window.location.href = '/';
-    }
-
-    // getInfos();
-  }, []);
-
-  const handleSubmit = async () => {
-    console.log(citizen.name);
-    await axios
-      .post(
-        'http://localhost:8000/api/appointments',
-        {
-          name: 'joao',
-          cpf: citizen.cpf,
-          date: date,
-          // unit_id: unidade?.id,
-          status: 'pendente',
-          user_id: citizen.cpf,
-          phone_number: telefone,
-          is_phone_number_whatsapp: isWhatsapp === 'sim' ? true : false,
-          appointment_type_id: selectedType,
-        },
-        {
-          headers: {
-            Authorization: 'Bearer ' + Cookies.get('token'),
-          },
-        },
-      )
-      .then(res => {
-        console.log(res);
-        alert('Agendamento realizado com sucesso!');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  const getTypeName = (id: number) => {
-    const name = typesInThisUnit.map(type => {
-      const object = tiposAtendimento.find(o => o.id === id);
-      return object?.name;
-    });
-
-    return name;
-  };
 
   return (
     <div>
-      {loading ? (
+      {unitAppointmentTypes.isLoading ? (
         <div className="h-screen w-screen flex items-center justify-center bg-login-bg bg-cover">
           <CircularProgress />
         </div>
@@ -315,15 +257,15 @@ const AgendarAtendimento = () => {
                     value={selectedType}
                     onChange={e => {
                       setSelectedType(e.target.value);
-                      console.log(e.target.value);
                     }}
                     name="radio-buttons-group"
                     className="mt-2"
                     row
                   >
-                    {typesInThisUnit?.map(type => {
+                    {unitAppointmentTypes.data?.data?.map(type => {
                       return (
                         <FormControlLabel
+                          key={type.appointment_type_name}
                           sx={{ color: 'white', fontSize: '12px' }}
                           value={type.appointment_type_id}
                           control={
@@ -336,7 +278,7 @@ const AgendarAtendimento = () => {
                               }}
                             />
                           }
-                          label={getTypeName(type.appointment_type_id)}
+                          label={type.appointment_type_name}
                         />
                       );
                     })}
@@ -352,7 +294,7 @@ const AgendarAtendimento = () => {
                       onChange={newValue => {
                         setDate(newValue as Date);
                       }}
-                      shouldDisableDate={shouldDisableDate}
+                      // shouldDisableDate={shouldDisableDate}
                       className="w-full text-white bg-white pl-4 border rounded-md"
                       renderInput={params => (
                         <TextField
@@ -368,7 +310,19 @@ const AgendarAtendimento = () => {
 
               <button
                 className="bg-green-800 text-white rounded-lg py-3 self-center px-4 max-w-fit md:w-full mt-4"
-                onClick={handleSubmit}
+                onClick={() =>
+                  registerAppointment.mutate({
+                    appointment_type_id: Number.parseInt(selectedType),
+                    date: date,
+                    phone_number: telefone,
+                    is_phone_number_whatsapp:
+                      isWhatsapp === 'sim' ? true : false,
+                    cpf: citizen.cpf,
+                    name: citizen.name,
+                    unit_id: unidade.data?.data[0].id!,
+                    status: 'agendado',
+                  })
+                }
               >
                 Confirmar agendamento
               </button>

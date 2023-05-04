@@ -197,7 +197,7 @@ const EditModal = ({
     data: unitSecretaries,
     isLoading: unitsIsLoading,
     isSuccess: unitSecretariesIsSuccess,
-  } = useUnitSecretaries(unit?.id ?? 0);
+  } = useUnitSecretaries({ unitId: unit?.id ?? 0 });
 
   unitSecretaries
     ? console.log(unitSecretaries.data)
@@ -241,7 +241,7 @@ const EditModal = ({
                   return (
                     <>
                       <Typography variant="body1" color={'blue'}>
-                        {secretarie.name}
+                        {secretarie.appointment_type_name}
                       </Typography>
                       <TableContainer component={Paper}>
                         <Table>

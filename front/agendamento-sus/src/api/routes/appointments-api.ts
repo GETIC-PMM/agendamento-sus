@@ -17,7 +17,11 @@ export const useUnitAppointmentsById = (unitId: string) => {
   });
 };
 
-export const useMutateRegisterAppointment = () => {
+export const useMutateRegisterAppointment = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) => {
   return useMutation({
     mutationFn: (params: RegisterAppointmentParams) =>
       instance.post('/appointments', params).then(
