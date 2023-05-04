@@ -17,9 +17,7 @@ const CreateUnidade = (props: CreateUnidadeProps) => {
   const [closeTime, setCloseTime] = useState<string | null>(
     dayjs().hour(17).minute(0).format(''),
   );
-  const [units, setUnits] = useState<UnitESUS[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<UnitESUS | null>(null);
-  const [selectedTiposAtendimento] = useState<number>(-1);
 
   const esusUnits = useEsusUnits();
 
