@@ -15,15 +15,6 @@ const CreateAgentes = () => {
   const handleOpen = () => setModalOpen(true);
   const handleClose = () => setModalOpen(false);
 
-  const schema = Yup.object().shape({
-    name: Yup.string().required('Nome é obrigatório'),
-    email: Yup.string().email().required('Email é obrigatório'),
-    password: Yup.string().required('Senha é obrigatória'),
-    c_password: Yup.string()
-      .required('Confirmação de senha é obrigatória')
-      .oneOf([Yup.ref('password')], 'Senhas devem ser iguais'),
-  });
-
   const createUser = useMutateRegisterUser();
 
   const clearInputs = () => {
@@ -31,6 +22,85 @@ const CreateAgentes = () => {
     setEmail('');
     setPassword('');
     setC_password('');
+  };
+
+  const [validateErrors, setValidateErrors] = useState({
+    equalPasswords: false,
+    emptyFields: {
+      name: false,
+      email: false,
+      password: false,
+      c_password: false,
+    },
+  });
+
+  const validate = () => {
+    if (name === '') {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, name: true },
+      });
+      return false;
+    } else {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, name: false },
+      });
+    }
+
+    if (email === '') {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, email: true },
+      });
+      return false;
+    } else {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, email: false },
+      });
+    }
+
+    if (password === '') {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, password: true },
+      });
+      return false;
+    } else {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, password: false },
+      });
+    }
+
+    if (c_password === '') {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, c_password: true },
+      });
+      return false;
+    } else {
+      setValidateErrors({
+        ...validateErrors,
+        emptyFields: { ...validateErrors.emptyFields, c_password: false },
+      });
+    }
+
+    if (password !== c_password) {
+      setValidateErrors({
+        ...validateErrors,
+        equalPasswords: true,
+      });
+      return false;
+    } else {
+      setValidateErrors({
+        ...validateErrors,
+        equalPasswords: false,
+      });
+    }
+
+    return true;
   };
 
   const onSubmit = async () => {
@@ -75,7 +145,12 @@ const CreateAgentes = () => {
               type="text"
               id="name"
               label="Nome"
-              className="w-full h-10 pl-4 border rounded-md"
+              sx={{
+                backgroundColor: validateErrors.emptyFields.name
+                  ? 'rgba(255, 0, 0, 0.5)'
+                  : '',
+              }}
+              className="w-full h-full pl-4 border rounded-md"
               value={name}
               onChange={e => setNome(e.target.value)}
               autoComplete="off"
@@ -86,7 +161,12 @@ const CreateAgentes = () => {
             <TextField
               type="text"
               id="email"
-              className="w-full h-10 pl-4 border rounded-md"
+              sx={{
+                backgroundColor: validateErrors.emptyFields.email
+                  ? 'rgba(255, 0, 0, 0.5)'
+                  : '',
+              }}
+              className="w-full h-full pl-4 border rounded-md"
               value={email}
               label="Email"
               onChange={e => setEmail(e.target.value)}
@@ -99,7 +179,14 @@ const CreateAgentes = () => {
               <TextField
                 type="password"
                 id="name"
-                className="w-full h-10 pl-4 border rounded-md"
+                className="w-full h-full pl-4 border rounded-md"
+                sx={{
+                  backgroundColor:
+                    validateErrors.emptyFields.password ||
+                    validateErrors.equalPasswords
+                      ? 'rgba(255, 0, 0, 0.5)'
+                      : '',
+                }}
                 value={password}
                 label="Senha"
                 onChange={e => setPassword(e.target.value)}
@@ -110,7 +197,14 @@ const CreateAgentes = () => {
                 type="password"
                 id="c_password"
                 label="Confirmar senha"
-                className="w-full h-10 pl-4 border rounded-md"
+                sx={{
+                  backgroundColor:
+                    validateErrors.emptyFields.c_password ||
+                    validateErrors.equalPasswords
+                      ? 'rgba(255, 0, 0, 0.5)'
+                      : '',
+                }}
+                className={`w-full pl-4 h-full border rounded-md`}
                 value={c_password}
                 onChange={e => setC_password(e.target.value)}
               />
@@ -121,7 +215,12 @@ const CreateAgentes = () => {
             type="submit"
             onClick={e => {
               e.preventDefault();
-              onSubmit();
+              console.log('SUBMIT');
+              if (validate()) {
+                console.log('VALIDOUS');
+                onSubmit();
+              }
+              console.log(validateErrors);
             }}
             className="bg-primary-base px-7 py-3 text-white rounded-md mt-4 "
           >

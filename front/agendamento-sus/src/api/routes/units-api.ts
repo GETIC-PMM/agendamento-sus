@@ -13,10 +13,13 @@ export const useMutateRegisterUnit = ({
 }) => {
   return useMutation({
     mutationFn: (params: RegisterUnitParams) =>
-      instance.post('/units', params).then(
-        response => response.data.data,
-        error => console.error(error),
-      ),
+      instance
+        .post('/units', params)
+        .then(response => response.data.data)
+        .catch(error => {
+          console.error(error);
+          throw error;
+        }),
     onSuccess,
   });
 };
