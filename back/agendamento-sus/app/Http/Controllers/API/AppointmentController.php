@@ -8,6 +8,7 @@ use App\Models\Secretary;
 use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AppointmentController extends BaseController
@@ -145,7 +146,11 @@ class AppointmentController extends BaseController
 
     public function searchByUnit(string $id)
     {
-        $appointments = Appointment::where('unit_id', $id)->get();
+        $appointments = DB::table('appointments as a')
+            ->where('a.unit_id', $id)
+            ->leftJoin('appointment_types as at', 'at.id', '=', 'a.appointment_type_id')
+            ->select('a.id', 'a.name', 'a.cpf', 'at.name as atendimento', 'a.date', 'a.status', 'a.phone_number', 'a.is_phone_number_whatsapp')
+            ->get();
 
         if (is_null($appointments)) {
             return $this->sendError('Appointment not found.');
