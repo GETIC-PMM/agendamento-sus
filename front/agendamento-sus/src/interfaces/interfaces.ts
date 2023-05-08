@@ -40,6 +40,11 @@ export interface AppointmentType {
   name: string;
 }
 
+export interface RegisterAppointmentTypeParams {
+  name: string;
+  duration: number;
+}
+
 export interface Agente {
   id: number;
   name: string;
