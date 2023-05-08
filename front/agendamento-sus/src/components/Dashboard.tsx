@@ -10,6 +10,7 @@ import {
   CircularProgress,
   FormControlLabel,
   MenuItem,
+  Modal,
   Select,
   Table,
   TableBody,
@@ -36,6 +37,9 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 const Dashboard = () => {
   const [selectedUnit, setSelectedUnit] = useState('0');
+  const [mutateModal, setMutateModal] = useState(false);
+  const [mutateRow, setMutateRow] = useState<Appointment>();
+
   // const [unitAppointments, setUnitAppointments] = useState<Appointment[]>([]);
   const [unitAppointmentTypes, setUnitAppointmentTypes] = useState<
     AppointmentType[]
@@ -52,10 +56,13 @@ const Dashboard = () => {
     Number.parseInt(selectedUnit),
   );
 
-  console.log(unitAppointments.data?.data);
+  console.log(unitAppointments.data?.data[0]);
 
   const cancelAppointment = useMutateCancelAppointment({
-    onSuccess: () => alert('Agendamento cancelado com sucesso!'),
+    onSuccess: () => {
+      alert('Agendamento cancelado com sucesso!');
+      setMutateModal(false);
+    },
   });
 
   const columns: GridColDef[] = [
@@ -120,7 +127,8 @@ const Dashboard = () => {
             <button
               className="bg-red-500 py-2 px-6 rounded text-white hover:bg-red-700 transition-all ease-in-out"
               onClick={() => {
-                cancelAppointment.mutate(params.row.id);
+                setMutateRow(params.row as Appointment);
+                setMutateModal(true);
               }}
             >
               Cancelar
@@ -133,6 +141,37 @@ const Dashboard = () => {
   return (
     <div>
       <div>
+        <Modal open={mutateModal}>
+          <div className="flex flex-col items-center justify-center h-screen w-screen bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-6 flex flex-col gap-2">
+              <div className="text-xl max-w-xl text-center">
+                {`Tem certeza que deseja cancelar o agendamento de ${
+                  mutateRow?.name
+                }, CPF ${mutateRow?.cpf} no dia ${dayjs(mutateRow?.date).format(
+                  'DD/MM/YYYY',
+                )}?`}
+              </div>
+              <div className="flex gap-2 mt-4 justify-center">
+                <button
+                  className="bg-red-500 w-40 py-2 px-6 rounded text-white hover:bg-red-700 transition-all ease-in-out"
+                  onClick={() => {
+                    setMutateModal(false);
+                  }}
+                >
+                  Não
+                </button>
+                <button
+                  className="bg-green-500 w-40 py-2 px-6 rounded text-white hover:bg-green-700 transition-all ease-in-out"
+                  onClick={() => {
+                    mutateRow?.id && cancelAppointment.mutate(mutateRow?.id);
+                  }}
+                >
+                  Sim
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
         <label htmlFor="">Selecione uma unidade</label>
         <Select
           value={selectedUnit}
@@ -241,7 +280,8 @@ const Dashboard = () => {
           {unitAppointments.isFetching ? (
             <CircularProgress />
           ) : (
-            unitAppointments.data && (
+            unitAppointments.data &&
+            (unitAppointments.data.data[0] ? (
               <DataGrid
                 rows={unitAppointments.data.data}
                 columns={columns}
@@ -256,7 +296,12 @@ const Dashboard = () => {
                 disableRowSelectionOnClick
                 pageSizeOptions={[25, 50, 100]}
               />
-            )
+            ) : (
+              <div>
+                {selectedUnit !== '0' &&
+                  'Ainda não existem agendamentos para a unidade selecionada'}
+              </div>
+            ))
 
             // <Paper sx={{ width: '100%' }}>
             //   <Table>
