@@ -13,52 +13,75 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
+import {
+  useAppointmentTypes,
+  useDeleteAppointmentType,
+  useMutateRegisterAppointmentType,
+} from '../api/routes/appointment-type-api';
 
 const TipoAtendimento = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newAtendimento, setNewAtendimento] = useState('');
   const [newDuration, setNewDuration] = useState(0);
-  const [tiposAtendimento, setTiposAtendimento] = useState<any[]>([]);
+
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const {
+    data: tiposAtendimento,
+    isLoading: isTiposAtendimentoLoading,
+    isError,
+    error,
+  } = useAppointmentTypes();
+
+  const createAppointmentType = useMutateRegisterAppointmentType();
+  const deleteAppointmentType = useDeleteAppointmentType();
 
   const handleCreateNewAtendimento = async () => {
-    await axios.post(
-      'http://localhost:8000/api/appointment-types',
-      {
-        name: newAtendimento,
-        duration: newDuration,
-      },
-      {
-        headers: {
-          Authorization: 'Bearer ' + Cookies.get('token'),
-        },
-      },
-    );
+    createAppointmentType.mutate({
+      name: newAtendimento,
+      duration: newDuration,
+    });
 
-    setNewAtendimento('');
-    setNewDuration(0);
-    getTiposAntendimento();
+    if (createAppointmentType.isError) {
+      console.log(createAppointmentType.error);
+      if (axios.isAxiosError(createAppointmentType.error)) {
+        setErrorMessage(
+          createAppointmentType.error.response?.data.message ||
+            'Já existe um tipo de atendimento com esse nome.',
+        );
+      }
+      setShowError(true);
+    } else if (createAppointmentType.isSuccess) {
+      console.log('Entrou is success');
+      setShowError(false);
+      setNewAtendimento('');
+      setNewDuration(0);
+    }
+
+    useAppointmentTypes().refetch();
   };
 
-  const getTiposAntendimento = async () => {
-    await axios
-      .get('http://localhost:8000/api/appointment-types', {
-        headers: {
-          Authorization: 'Bearer ' + Cookies.get('token'),
-        },
-      })
-      .then(res => {
-        console.log(res.data.data);
-        setTiposAtendimento(res.data.data);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+  const validateSubmit = () => {
+    if (newAtendimento === '') {
+      setShowError(true);
+      setErrorMessage('O titulo do tipo de atendimento é obrigatório');
+      return false;
+    }
+
+    if (newDuration === 0) {
+      setShowError(true);
+      setErrorMessage('O campo duração é obrigatório e deve ser maior que 0');
+      return false;
+    }
+
+    return true;
   };
 
-  useEffect(() => {
-    getTiposAntendimento();
-  }, []);
+  const handleDeleteAppointmentType = async (id: string) => {
+    deleteAppointmentType.mutate(id);
+    useAppointmentTypes().refetch();
+  };
 
   return (
     <>
@@ -71,7 +94,33 @@ const TipoAtendimento = () => {
           Tipos de atendimento
         </Typography>
       </div>
-      {isLoading ? (
+
+      <div
+        className={`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4 ${
+          showError ? 'block' : 'hidden'
+        }`}
+        role="alert"
+      >
+        <div className="flex gap-1">
+          <div>
+            <strong className="font-bold">Erro no cadastro! </strong>
+            <span className="block sm:inline">{errorMessage}</span>
+          </div>
+          <span onClick={() => setShowError(false)}>
+            <svg
+              className="fill-current h-6 w-6 text-red-500"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <title>Fechar</title>
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      {isTiposAtendimentoLoading ? (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />
         </div>
@@ -87,13 +136,22 @@ const TipoAtendimento = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tiposAtendimento.map(tipoAtendimento => {
+                {tiposAtendimento?.data.map(tipoAtendimento => {
                   return (
                     <TableRow key={tipoAtendimento.id}>
                       <TableCell>{tipoAtendimento.name}</TableCell>
                       <TableCell>{tipoAtendimento.duration} minutos</TableCell>
                       <TableCell align="right">
-                        <Button size="small" variant="contained" color="error">
+                        <Button
+                          onClick={() =>
+                            handleDeleteAppointmentType(
+                              tipoAtendimento.id.toString(),
+                            )
+                          }
+                          size="small"
+                          variant="contained"
+                          color="error"
+                        >
                           Excluir
                         </Button>
                       </TableCell>
@@ -123,7 +181,7 @@ const TipoAtendimento = () => {
             />
             <Button
               onClick={() => {
-                handleCreateNewAtendimento();
+                if (validateSubmit()) handleCreateNewAtendimento();
               }}
               variant="contained"
               sx={{ width: '50%' }}

@@ -9,10 +9,13 @@ import {
 export const useMutateRegisterUser = () => {
   return useMutation({
     mutationFn: (params: RegisterUserParams) =>
-      instanceNoAuth.post('/register', params).then(
-        response => response.data,
-        error => console.error(error),
-      ),
+      instanceNoAuth
+        .post('/register', params)
+        .then(response => response.data)
+        .catch((error: Error) => {
+          console.error(error);
+          throw error;
+        }),
   });
 };
 
