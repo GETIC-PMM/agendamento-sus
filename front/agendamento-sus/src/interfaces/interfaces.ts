@@ -27,11 +27,10 @@ export interface Appointment {
   name: string;
   cpf: string;
   date: string;
-  unit_id: number;
-  appointment_type_id: number;
   status: string;
   phone_number: number;
   is_phone_number_whatsapp: boolean;
+  atendimento: string;
 }
 
 export interface AppointmentType {
