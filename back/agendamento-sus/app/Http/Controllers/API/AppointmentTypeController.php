@@ -32,6 +32,9 @@ class AppointmentTypeController extends BaseController
      */
     public function store(Request $request)
     {
+        if (AppointmentType::where('name', $request->name)->exists()) {
+            return $this->sendError('Appointment type name already exists.');
+        }
         $appoitmentType = AppointmentType::create($request->all());
         return $this->sendResponse($appoitmentType, 'Appointment type created successfully.');
     }
@@ -83,8 +86,9 @@ class AppointmentTypeController extends BaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AppointmentType $appointmentType)
+    public function destroy(int $id)
     {
+        $appointmentType = AppointmentType::find($id);
         $appointmentType->delete();
 
         return $this->sendResponse($appointmentType, 'Appointment type deleted successfully.');

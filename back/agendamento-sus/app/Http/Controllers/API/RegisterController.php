@@ -7,6 +7,8 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends BaseController
@@ -27,6 +29,16 @@ class RegisterController extends BaseController
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        try {
+            $user = DB::table('users')->where('email', $request->email)->first();
+            if ($user) {
+                return $this->sendError('User already exists.', [], 400);
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->sendError('An error occurred while checking if the user exists.', [], 500);
         }
 
         $input = $request->all();

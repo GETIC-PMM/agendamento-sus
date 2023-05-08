@@ -32,6 +32,7 @@ class UnitController extends BaseController
      */
     public function store(Request $request)
     {
+
         $input = $request->all();
 
         $validator = Validator::make($input, [
@@ -45,6 +46,10 @@ class UnitController extends BaseController
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        if (Unit::where('name', $request->name)->exists()) {
+            return $this->sendError('Unit name already exists.');
         }
 
         $unit = Unit::create($input);
