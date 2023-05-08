@@ -32,6 +32,7 @@ import {
   useMutateCancelAppointment,
   useUnitAppointmentsById,
 } from '../api/routes/appointments-api';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 const Dashboard = () => {
   const [selectedUnit, setSelectedUnit] = useState('0');
@@ -51,9 +52,83 @@ const Dashboard = () => {
     Number.parseInt(selectedUnit),
   );
 
+  console.log(unitAppointments.data?.data);
+
   const cancelAppointment = useMutateCancelAppointment({
     onSuccess: () => alert('Agendamento cancelado com sucesso!'),
   });
+
+  const columns: GridColDef[] = [
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 70,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'name',
+      headerName: 'Nome',
+      flex: 1,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'cpf',
+      headerName: 'CPF',
+      flex: 1,
+      headerAlign: 'center',
+      align: 'center',
+      valueFormatter: params => {
+        return cpfFormatter(params.value as string);
+      },
+    },
+    {
+      field: 'atendimento',
+      headerName: 'Atendimento',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 1,
+    },
+    {
+      field: 'date',
+      headerName: 'Data',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 1,
+      valueFormatter: params => {
+        return dayjs(params.value as string).format('DD/MM/YYYY');
+      },
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      headerAlign: 'center',
+      align: 'center',
+      width: 200,
+      sortable: false,
+      flex: 1,
+      renderCell: params =>
+        params.row.status.toLowerCase() === 'agendado' && (
+          <div className="flex gap-2">
+            <button
+              className="bg-red-500 py-2 px-6 rounded text-white hover:bg-red-700 transition-all ease-in-out"
+              onClick={() => {
+                cancelAppointment.mutate(params.row.id);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        ),
+    },
+  ];
 
   return (
     <div>
@@ -75,7 +150,7 @@ const Dashboard = () => {
           ))}
         </Select>
         <div className="mt-4">
-          <Accordion>
+          {/* <Accordion>
             <AccordionSummary>
               <Typography>Filtrar por CPF</Typography>
             </AccordionSummary>
@@ -130,7 +205,7 @@ const Dashboard = () => {
                 </button>
               </div>
             </AccordionDetails>
-          </Accordion>
+          </Accordion> */}
           {/* <Accordion>
                         <AccordionSummary>
                             <Typography>Filtrar por data</Typography>
@@ -146,7 +221,7 @@ const Dashboard = () => {
                             </div>
                         </AccordionDetails>
                     </Accordion> */}
-          <FormControlLabel
+          {/* <FormControlLabel
             control={
               <Checkbox
                 checked={is7DayFilterChecked}
@@ -159,74 +234,91 @@ const Dashboard = () => {
               />
             }
             label="Proximos 7 dias"
-          />
+          /> */}
         </div>
 
         <div className="mt-8 flex justify-center w-full">
           {unitAppointments.isFetching ? (
             <CircularProgress />
           ) : (
-            <Paper sx={{ width: '100%' }}>
-              <Table>
-                <TableHead>
-                  <TableRow style={{ backgroundColor: '#023E84' }}>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      Nome
-                    </TableCell>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      CPF
-                    </TableCell>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      Atendimento
-                    </TableCell>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      Data
-                    </TableCell>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      Status
-                    </TableCell>
-                    <TableCell style={{ color: 'white' }} align="center">
-                      Cancelar
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {unitAppointments.data?.data.map(appointment => (
-                    <TableRow key={appointment.id}>
-                      <TableCell align="center">{appointment.name}</TableCell>
-                      <TableCell align="center">
-                        {cpfFormatter(appointment.cpf)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {/* {getAppointmentTypeName(
-                          appointment.appointment_type_id,
-                        )} */}
-                      </TableCell>
-                      <TableCell align="center">
-                        {dayjs(appointment.date).format('DD/MM/YYYY')}
-                      </TableCell>
-                      <TableCell align="center">
-                        {appointment.status.charAt(0).toUpperCase() +
-                          appointment.status.slice(1)}
-                      </TableCell>
-                      <TableCell align="center">
-                        <button
-                          className="bg-red-400 py-2 px-4 rounded text-white"
-                          color="error"
-                          onClick={() => {
-                            console.log('CANCELAR: ', appointment);
-                            setIsAppointmentDataLoading(true);
-                            cancelAppointment.mutate(appointment.id);
-                          }}
-                        >
-                          Cancelar
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Paper>
+            unitAppointments.data && (
+              <DataGrid
+                rows={unitAppointments.data.data}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      page: 0,
+                      pageSize: 25,
+                    },
+                  },
+                }}
+                disableRowSelectionOnClick
+                pageSizeOptions={[25, 50, 100]}
+              />
+            )
+
+            // <Paper sx={{ width: '100%' }}>
+            //   <Table>
+            //     <TableHead>
+            //       <TableRow style={{ backgroundColor: '#023E84' }}>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           Nome
+            //         </TableCell>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           CPF
+            //         </TableCell>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           Atendimento
+            //         </TableCell>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           Data
+            //         </TableCell>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           Status
+            //         </TableCell>
+            //         <TableCell style={{ color: 'white' }} align="center">
+            //           Cancelar
+            //         </TableCell>
+            //       </TableRow>
+            //     </TableHead>
+            //     <TableBody>
+            //       {unitAppointments.data?.data.map(appointment => (
+            //         <TableRow key={appointment.id}>
+            //           <TableCell align="center">{appointment.name}</TableCell>
+            //           <TableCell align="center">
+            //             {cpfFormatter(appointment.cpf)}
+            //           </TableCell>
+            //           <TableCell align="center">
+            //             {/* {getAppointmentTypeName(
+            //               appointment.appointment_type_id,
+            //             )} */}
+            //           </TableCell>
+            //           <TableCell align="center">
+            //             {dayjs(appointment.date).format('DD/MM/YYYY')}
+            //           </TableCell>
+            //           <TableCell align="center">
+            //             {appointment.status.charAt(0).toUpperCase() +
+            //               appointment.status.slice(1)}
+            //           </TableCell>
+            //           <TableCell align="center">
+            //             <button
+            //               className="bg-red-400 py-2 px-4 rounded text-white"
+            //               color="error"
+            //               onClick={() => {
+            //                 console.log('CANCELAR: ', appointment);
+            //                 setIsAppointmentDataLoading(true);
+            //                 cancelAppointment.mutate(appointment.id);
+            //               }}
+            //             >
+            //               Cancelar
+            //             </button>
+            //           </TableCell>
+            //         </TableRow>
+            //       ))}
+            //     </TableBody>
+            //   </Table>
+            // </Paper>
           )}
         </div>
       </div>
