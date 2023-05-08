@@ -21,6 +21,7 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import { Agente } from '../interfaces/interfaces';
 import { useGetUsers } from '../api/routes/users-api';
+import { Typography } from '@mui/material';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -127,6 +128,15 @@ const ShowAgentes = () => {
 
   return (
     <div>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Agentes de saúde
+        </Typography>
+      </div>
       {(isUserFetching && (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />

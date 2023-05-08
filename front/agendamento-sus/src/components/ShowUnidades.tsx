@@ -68,6 +68,15 @@ const ShowUnidades = () => {
 
   return (
     <div>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Unidades
+        </Typography>
+      </div>
       <EditModal
         opened={opened}
         onClose={onClose}
@@ -341,7 +350,13 @@ const EditModal = ({
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <Button onClick={onSubmit}>Criar atendimento</Button>
+                <Button
+                  onClick={() => {
+                    onSubmit();
+                  }}
+                >
+                  Criar atendimento
+                </Button>
               </>
             )}
 

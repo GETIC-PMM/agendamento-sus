@@ -43,6 +43,15 @@ const CreateUnidade = (props: CreateUnidadeProps) => {
 
   return (
     <div>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Cadastrar unidade
+        </Typography>
+      </div>
       <div className="border-t-[50px] border-t-primary-base rounded-lg border border-zinc-200 p-6 drop-shadow">
         {esusUnitsIsLoading ? (
           <div className="flex flex-col items-center gap-2 px-6 py-4">
