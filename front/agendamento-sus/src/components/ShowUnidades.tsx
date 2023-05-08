@@ -68,6 +68,15 @@ const ShowUnidades = () => {
 
   return (
     <div>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Unidades
+        </Typography>
+      </div>
       <EditModal
         opened={opened}
         onClose={onClose}
@@ -79,7 +88,10 @@ const ShowUnidades = () => {
         onSubmit={onSubmit}
       />
       {unitsIsLoading ? (
-        <CircularProgress />
+        <Paper className="flex flex-col items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 gap-2 px-6 py-4">
+          <CircularProgress />
+          <Typography variant="h6">Carregando...</Typography>
+        </Paper>
       ) : (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
@@ -197,7 +209,7 @@ const EditModal = ({
     data: unitSecretaries,
     isLoading: unitsIsLoading,
     isSuccess: unitSecretariesIsSuccess,
-  } = useUnitSecretaries(unit?.id ?? 0);
+  } = useUnitSecretaries({ unitId: unit?.id ?? 0 });
 
   unitSecretaries
     ? console.log(unitSecretaries.data)
@@ -205,6 +217,12 @@ const EditModal = ({
 
   return (
     <div className="flex items-center justify-center">
+      {unitsIsLoading && (
+        <Paper className="flex flex-col items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 gap-2 px-6 py-4">
+          <CircularProgress />
+          <Typography variant="h6">Carregando unidade...</Typography>
+        </Paper>
+      )}
       {unitSecretariesIsSuccess && (
         <Modal
           aria-labelledby="modal-modal-title"
@@ -235,13 +253,18 @@ const EditModal = ({
                 Atendimentos da unidade
               </Typography>
               {unitsIsLoading ? (
-                <CircularProgress />
+                <div className="w-full flex flex-col items-center">
+                  <CircularProgress />
+                  <Typography variant="h6" align="center">
+                    Carregando informações da unidade...
+                  </Typography>
+                </div>
               ) : (
                 unitSecretaries?.data.map((secretarie, index) => {
                   return (
                     <>
                       <Typography variant="body1" color={'blue'}>
-                        {secretarie.name}
+                        {secretarie.appointment_type_name}
                       </Typography>
                       <TableContainer component={Paper}>
                         <Table>
@@ -327,7 +350,13 @@ const EditModal = ({
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <Button onClick={onSubmit}>Criar atendimento</Button>
+                <Button
+                  onClick={() => {
+                    onSubmit();
+                  }}
+                >
+                  Criar atendimento
+                </Button>
               </>
             )}
 

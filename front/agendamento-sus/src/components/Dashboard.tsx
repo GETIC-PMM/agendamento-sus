@@ -27,11 +27,15 @@ import {
   AppointmentType,
 } from '../interfaces/interfaces';
 import { AppointmentForm } from '@devexpress/dx-react-scheduler';
+import { useGetUnits } from '../api/routes/units-api';
+import {
+  useMutateCancelAppointment,
+  useUnitAppointmentsById,
+} from '../api/routes/appointments-api';
 
 const Dashboard = () => {
-  const [unidadeData, setUnidadeData] = useState<Unidade[]>([]);
-  const [selectedUnit, setSelectedUnit] = useState<string>('');
-  const [unitAppointments, setUnitAppointments] = useState<Appointment[]>([]);
+  const [selectedUnit, setSelectedUnit] = useState('0');
+  // const [unitAppointments, setUnitAppointments] = useState<Appointment[]>([]);
   const [unitAppointmentTypes, setUnitAppointmentTypes] = useState<
     AppointmentType[]
   >([]);
@@ -41,185 +45,15 @@ const Dashboard = () => {
   const [isAppointmentDataLoading, setIsAppointmentDataLoading] =
     useState<boolean>(false);
 
-  // const getUnitAppointments = async (
-  //   unitId: string,
-  //   is7DayFilterChecked: boolean,
-  // ) => {
-  //   appointmentsAPI
-  //     .getUnitAppointmentsById(unitId)
-  //     .then(response => {
-  //       console.log('APPOINTMENTS: ', response);
-  //       getUnitAppointmentsType(unitId);
+  const units = useGetUnits();
 
-  //       //lógica para filtrar os agendamentos que estão dentro de 7 dias
-  //       const _response = response.map((appointment: Appointment) => {
-  //         const _date = dayjs(appointment.date);
-  //         const _today = dayjs(new Date().setHours(0, 0, 0, 0));
-  //         const _7daysFromToday = dayjs(new Date()).add(7, 'day');
+  const unitAppointments = useUnitAppointmentsById(
+    Number.parseInt(selectedUnit),
+  );
 
-  //         if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
-  //           return {
-  //             id: appointment.id,
-  //             name: appointment.name,
-  //             date: appointment.date,
-  //             cpf: appointment.cpf,
-  //             phone_number: appointment.phone_number,
-  //             is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
-  //             appointment_type_id: appointment.appointment_type_id,
-  //             status: appointment.status,
-  //           };
-  //         } else {
-  //           return [] as Appointment[];
-  //         }
-  //       });
-
-  //       const filteredArr = _response.filter(
-  //         value => value !== undefined || [],
-  //       );
-
-  //       console.log('_RESPONSE DATA AJUSTADA', filteredArr);
-
-  //       if (is7DayFilterChecked) {
-  //         setUnitAppointments(filteredArr as Appointment[]);
-  //         console.log('FILTROU');
-  //       } else {
-  //         setUnitAppointments(response as Appointment[]);
-  //         console.log('NAO FILTROU');
-  //       }
-
-  //       setIsAppointmentDataLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
-
-  // const getUnitAppointmentsType = async (unitId: string) => {
-  //   appointmentTypeApi
-  //     .getUnitAppointmentsById(unitId)
-  //     .then(response => {
-  //       console.log('APPOINTMENTS TYPES: ', response);
-
-  //       if (response.length === 1) {
-  //         const _appointmentTypes = [...unitAppointmentTypes];
-  //         _appointmentTypes.push(response[0]);
-  //         setUnitAppointmentTypes(_appointmentTypes);
-  //       } else {
-  //         setUnitAppointmentTypes(response);
-  //       }
-
-  //       setIsAppointmentDataLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
-
-  // const getUnitAppointmentsByCPF = async (
-  //   unitId: string,
-  //   cpf: string,
-  //   is7DayFilterChecked: boolean,
-  // ) => {
-  //   const cpfWithoutMask = cpf.replace(/\D/g, '');
-  //   console.log('CPF SEM MASCARA: ', cpfWithoutMask);
-  //   await axios
-  //     .get(
-  //       `http://localhost:8000/api/appointments/byCPF/${unitId}/${cpfWithoutMask}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${Cookies.get('token')}`,
-  //         },
-  //       },
-  //     )
-  //     .then(response => {
-  //       const _response = response.data.data.map((appointment: Appointment) => {
-  //         const _date = dayjs(appointment.date);
-  //         const _today = dayjs(new Date().setHours(0, 0, 0, 0));
-  //         const _7daysFromToday = dayjs(new Date()).add(7, 'day');
-
-  //         if (_date.isAfter(_today) && _date.isBefore(_7daysFromToday)) {
-  //           return {
-  //             name: appointment.name,
-  //             date: appointment.date,
-  //             cpf: appointment.cpf,
-  //             phone_number: appointment.phone_number,
-  //             is_phone_number_whatsapp: appointment.is_phone_number_whatsapp,
-  //             appointment_type_id: appointment.appointment_type_id,
-  //             status: appointment.status,
-  //           };
-  //         } else {
-  //           return;
-  //         }
-  //       });
-
-  //       const filteredArr = _response.filter(
-  //         (value: Appointment) => value !== undefined,
-  //       );
-
-  //       if (is7DayFilterChecked) {
-  //         setUnitAppointments(filteredArr);
-  //         console.log('FILTROU');
-  //       } else {
-  //         setUnitAppointments(response.data.data);
-  //         console.log('NAO FILTROU');
-  //       }
-
-  //       console.log('APPOINTMENTS BY CPF: ', response);
-  //       setIsAppointmentDataLoading(false);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   axios
-  //     .get('http://localhost:8000/api/units', {
-  //       headers: {
-  //         Authorization: `Bearer ${Cookies.get('token')}`,
-  //       },
-  //     })
-  //     .then(response => {
-  //       setUnidadeData(response.data.data);
-  //       console.log('UNIDADE DATA: ', response.data.data);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-
-  //   getUnitAppointmentsType(selectedUnit);
-  // }, []);
-
-  const getAppointmentTypeName = (appointmentTypeId: number) => {
-    // if (unitAppointmentTypes.length) {
-    //   const _appointmentType = unitAppointmentTypes.find(
-    //     (appointmentType: AppointmentType) =>
-    //       appointmentType.id === appointmentTypeId,
-    //   );
-    //   return _appointmentType?.name;
-    // } else {
-    //   const _unitAppointmentTypes = [];
-    //   _unitAppointmentTypes.push(unitAppointmentTypes);
-    //   const _appointmentType = _unitAppointmentTypes.find(
-    //     (appointmentType: AppointmentType) =>
-    //       appointmentType.id === appointmentTypeId,
-    //   );
-    //   return _appointmentType?.name;
-    // }
-  };
-
-  // const handleCancelAppointment = async (appointmentId: number) => {
-  //   await axios
-  //     .put(`http://localhost:8000/api/appointments/${appointmentId}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${Cookies.get('token')}`,
-  //       },
-  //     })
-  //     .then(response => {
-  //       console.log(response);
-  //       getUnitAppointments(selectedUnit, is7DayFilterChecked);
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     });
-  // };
+  const cancelAppointment = useMutateCancelAppointment({
+    onSuccess: () => alert('Agendamento cancelado com sucesso!'),
+  });
 
   return (
     <div>
@@ -234,7 +68,7 @@ const Dashboard = () => {
           }}
           sx={{ width: '100%' }}
         >
-          {unidadeData.map(unidade => (
+          {units.data?.data.map(unidade => (
             <MenuItem key={unidade.id} value={unidade.id}>
               {unidade.name}
             </MenuItem>
@@ -329,7 +163,7 @@ const Dashboard = () => {
         </div>
 
         <div className="mt-8 flex justify-center w-full">
-          {isAppointmentDataLoading ? (
+          {unitAppointments.isFetching ? (
             <CircularProgress />
           ) : (
             <Paper sx={{ width: '100%' }}>
@@ -357,7 +191,7 @@ const Dashboard = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {unitAppointments.map(appointment => (
+                  {unitAppointments.data?.data.map(appointment => (
                     <TableRow key={appointment.id}>
                       <TableCell align="center">{appointment.name}</TableCell>
                       <TableCell align="center">
@@ -382,7 +216,7 @@ const Dashboard = () => {
                           onClick={() => {
                             console.log('CANCELAR: ', appointment);
                             setIsAppointmentDataLoading(true);
-                            // handleCancelAppointment(appointment.id);
+                            cancelAppointment.mutate(appointment.id);
                           }}
                         >
                           Cancelar

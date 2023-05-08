@@ -6,9 +6,17 @@ import {
   Secretaries,
 } from '../../interfaces/interfaces';
 
-export const useUnitSecretaries = (unitId: number) => {
+export const useUnitSecretaries = ({
+  unitId,
+  onSuccess,
+  onError,
+}: {
+  unitId: number | null;
+  onSuccess?: (data: APIResponse<Secretaries[]>) => void;
+  onError?: (error: any) => void;
+}) => {
   return useQuery({
-    queryKey: ['unitSecretaries'],
+    queryKey: ['unitSecretaries', unitId],
     queryFn: () =>
       instance
         .get<APIResponse<Secretaries[]>>(
@@ -19,6 +27,8 @@ export const useUnitSecretaries = (unitId: number) => {
           console.error(error);
           throw error;
         }),
+    onSuccess,
+    onError,
   });
 };
 

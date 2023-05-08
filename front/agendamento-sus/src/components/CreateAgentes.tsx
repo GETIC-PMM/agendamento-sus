@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, TextField } from '@mui/material';
 import * as Yup from 'yup';
 import { useMutateRegisterUser } from '../api/routes/users-api';
+import { Typography } from '@mui/material';
 // import usersAPI from '../api/routes/users-api';
 
 const CreateAgentes = () => {
@@ -14,15 +15,6 @@ const CreateAgentes = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const handleOpen = () => setModalOpen(true);
   const handleClose = () => setModalOpen(false);
-
-  const schema = Yup.object().shape({
-    name: Yup.string().required('Nome é obrigatório'),
-    email: Yup.string().email().required('Email é obrigatório'),
-    password: Yup.string().required('Senha é obrigatória'),
-    c_password: Yup.string()
-      .required('Confirmação de senha é obrigatória')
-      .oneOf([Yup.ref('password')], 'Senhas devem ser iguais'),
-  });
 
   const createUser = useMutateRegisterUser();
 
@@ -50,6 +42,15 @@ const CreateAgentes = () => {
 
   return (
     <div>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Cadastrar agente de saúde
+        </Typography>
+      </div>
       <Modal
         open={modalOpen}
         onClose={handleClose}
@@ -75,7 +76,7 @@ const CreateAgentes = () => {
               type="text"
               id="name"
               label="Nome"
-              className="w-full h-10 pl-4 border rounded-md"
+              className="w-full h-full pl-4 border rounded-md"
               value={name}
               onChange={e => setNome(e.target.value)}
               autoComplete="off"
@@ -86,7 +87,7 @@ const CreateAgentes = () => {
             <TextField
               type="text"
               id="email"
-              className="w-full h-10 pl-4 border rounded-md"
+              className="w-full h-full pl-4 border rounded-md"
               value={email}
               label="Email"
               onChange={e => setEmail(e.target.value)}
@@ -99,7 +100,7 @@ const CreateAgentes = () => {
               <TextField
                 type="password"
                 id="name"
-                className="w-full h-10 pl-4 border rounded-md"
+                className="w-full h-full pl-4 border rounded-md"
                 value={password}
                 label="Senha"
                 onChange={e => setPassword(e.target.value)}
@@ -110,7 +111,7 @@ const CreateAgentes = () => {
                 type="password"
                 id="c_password"
                 label="Confirmar senha"
-                className="w-full h-10 pl-4 border rounded-md"
+                className={`w-full pl-4 h-full border rounded-md`}
                 value={c_password}
                 onChange={e => setC_password(e.target.value)}
               />

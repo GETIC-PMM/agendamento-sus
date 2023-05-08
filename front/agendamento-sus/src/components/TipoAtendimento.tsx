@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
 
 const TipoAtendimento = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +62,15 @@ const TipoAtendimento = () => {
 
   return (
     <>
+      <div className="border-l-4 border-blue-700 pl-2 mb-4">
+        <Typography
+          className="text-blue-700"
+          fontWeight="bold"
+          sx={{ marginBottom: '1rem' }}
+        >
+          Tipos de atendimento
+        </Typography>
+      </div>
       {isLoading ? (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />

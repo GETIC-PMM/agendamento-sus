@@ -53,7 +53,7 @@ export interface DaysInterface {
 
 export interface Secretaries {
   appointment_type_id: number;
-  name: string;
+  appointment_type_name: string;
   days: DaysInterface[];
   unit_id: number;
 }
@@ -74,7 +74,6 @@ export type RegisterAppointmentParams = {
   date: Date;
   unit_id: number;
   status: string;
-  user_id: number;
   phone_number: string;
   is_phone_number_whatsapp: boolean;
   appointment_type_id: number;
@@ -82,9 +81,8 @@ export type RegisterAppointmentParams = {
 
 export type RegisterUnitParams = {
   name: string;
-  open_time: string;
-  close_time: string;
-  code: number;
+  open_time: Date;
+  close_time: Date;
   bairro: string;
   rua: string;
   numero: string;

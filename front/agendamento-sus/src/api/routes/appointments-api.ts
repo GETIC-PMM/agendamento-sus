@@ -1,28 +1,47 @@
 import {
   APIResponse,
+  Appointment,
   RegisterAppointmentParams,
   Unidade,
 } from '../../interfaces/interfaces';
 import { instance } from '../instance';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-export const useUnitAppointmentsById = (unitId: string) => {
+export const useUnitAppointmentsById = (unitId: number) => {
   return useQuery({
-    queryKey: ['appointments'],
+    queryKey: ['appointments', unitId],
     queryFn: () =>
       instance
-        .get<APIResponse<Unidade>>(`appointments/units/${unitId}`)
+        .get<APIResponse<Appointment[]>>(`appointments/units/${unitId}`)
         .then(response => response.data),
-    enabled: false,
   });
 };
 
-export const useMutateRegisterAppointment = () => {
+export const useMutateRegisterAppointment = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) => {
   return useMutation({
     mutationFn: (params: RegisterAppointmentParams) =>
       instance.post('/appointments', params).then(
         response => response.data,
         error => console.error(error),
       ),
+    onSuccess,
+  });
+};
+
+export const useMutateCancelAppointment = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) => {
+  return useMutation({
+    mutationFn: (appointmentId: number) =>
+      instance
+        .put(`/appointments/${appointmentId}`)
+        .then(response => response.data),
+    onSuccess,
   });
 };
