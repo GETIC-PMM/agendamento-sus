@@ -5,6 +5,7 @@ import { useMutateRegisterUser } from '../api/routes/users-api';
 import { Typography } from '@mui/material';
 import axios from 'axios';
 import FormAlert from './FormAlert';
+import { validateEmail } from '../utils/email-valitadation';
 // import usersAPI from '../api/routes/users-api';
 
 const CreateAgentes = () => {
@@ -83,6 +84,12 @@ const CreateAgentes = () => {
     if (password !== c_password) {
       setShowError(true);
       setErrorMessage('Senhas não conferem');
+      return false;
+    }
+
+    if (!validateEmail(email)) {
+      setShowError(true);
+      setErrorMessage('Email inválido');
       return false;
     }
 

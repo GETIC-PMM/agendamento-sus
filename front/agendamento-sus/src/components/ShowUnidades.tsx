@@ -8,7 +8,13 @@ import Paper from '@mui/material/Paper';
 import Modal from '@mui/material/Modal';
 import { useDeleteUnit, useGetUnits } from '../api/routes/units-api';
 import { FiEdit, FiTrash } from 'react-icons/fi';
-import { Button, CircularProgress, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 import { weekdaysTranslation } from '../utils/consts';
 import * as dayjs from 'dayjs';
@@ -22,13 +28,17 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
 const ShowUnidades = () => {
-  const { data: units, isLoading: unitsIsLoading } = useGetUnits();
-
+  const {
+    data: units,
+    isLoading: unitsIsLoading,
+    isFetching: unitIsFetching,
+  } = useGetUnits();
   const [editUnit, setEditUnit] = useState<Unidade | null>(null);
-
   const [selectedAppointmentType, setSelectedAppointmentType] = useState<
     number | null
   >(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteUnitObject, setDeleteUnit] = useState<Unidade | null>(null);
 
   const opened = editUnit !== null;
 
@@ -67,8 +77,9 @@ const ShowUnidades = () => {
     setSelectedAppointmentType(null);
   };
 
-  const handleDelete = (unitId: number) => {
-    deleteUnit.mutate(unitId);
+  const handleDelete = (unit: Unidade) => {
+    deleteUnit.mutate(unit.id);
+    setDeleteModalOpen(false);
     useGetUnits().refetch();
   };
 
@@ -83,6 +94,47 @@ const ShowUnidades = () => {
           Unidades
         </Typography>
       </div>
+
+      <Modal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div className="p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded">
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Deletar unidade
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Tem certeza que deseja deletar essa unidade?
+            {deleteUnitObject && (
+              <Typography align="center" fontSize={14}>
+                {deleteUnitObject.name}
+              </Typography>
+            )}
+            <div className="flex justify-around mt-6">
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  handleDelete(deleteUnitObject!);
+                }}
+              >
+                Confirmar
+              </Button>
+            </div>
+          </Typography>
+        </div>
+      </Modal>
+
       <EditModal
         opened={opened}
         onClose={onClose}
@@ -93,7 +145,7 @@ const ShowUnidades = () => {
         setSelectedAppointmentType={setSelectedAppointmentType}
         onSubmit={onSubmit}
       />
-      {unitsIsLoading ? (
+      {unitsIsLoading || unitIsFetching ? (
         <Paper className="flex flex-col items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 gap-2 px-6 py-4">
           <CircularProgress />
           <Typography variant="h6">Carregando...</Typography>
@@ -142,7 +194,10 @@ const ShowUnidades = () => {
                         </div>
                         <div
                           className="flex justify-center"
-                          onClick={() => handleDelete(unit.id)}
+                          onClick={() => {
+                            setDeleteUnit(unit);
+                            setDeleteModalOpen(true);
+                          }}
                         >
                           <FiTrash
                             color="white"

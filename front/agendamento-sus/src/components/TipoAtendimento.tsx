@@ -19,6 +19,8 @@ import {
   useMutateRegisterAppointmentType,
 } from '../api/routes/appointment-type-api';
 import FormAlert from './FormAlert';
+import Modal from '@mui/material/Modal';
+import { AppointmentType, Unidade } from '../interfaces/interfaces';
 
 const TipoAtendimento = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -31,11 +33,16 @@ const TipoAtendimento = () => {
   const {
     data: tiposAtendimento,
     isLoading: isTiposAtendimentoLoading,
+    isFetching,
     isError,
     error,
   } = useAppointmentTypes();
 
   const createAppointmentType = useMutateRegisterAppointmentType();
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteAppointmentTypeObject, setDeleteAppointmentType] =
+    useState<AppointmentType | null>(null);
   const deleteAppointmentType = useDeleteAppointmentType();
 
   const handleCreateNewAtendimento = async () => {
@@ -84,6 +91,12 @@ const TipoAtendimento = () => {
     useAppointmentTypes().refetch();
   };
 
+  const handleDelete = (appointmentType: AppointmentType) => {
+    deleteAppointmentType.mutate(appointmentType.id.toString());
+    setDeleteModalOpen(false);
+    useAppointmentTypes().refetch();
+  };
+
   return (
     <>
       <div className="border-l-4 border-blue-700 pl-2 mb-4">
@@ -102,7 +115,47 @@ const TipoAtendimento = () => {
         errorMessage={errorMessage}
       />
 
-      {isTiposAtendimentoLoading ? (
+      <Modal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div className="p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded">
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Deletar unidade
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Tem certeza que deseja deletar essa unidade?
+            {deleteAppointmentTypeObject && (
+              <Typography align="center" fontSize={14}>
+                {deleteAppointmentTypeObject.name}
+              </Typography>
+            )}
+            <div className="flex justify-around mt-6">
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  handleDelete(deleteAppointmentTypeObject!);
+                }}
+              >
+                Confirmar
+              </Button>
+            </div>
+          </Typography>
+        </div>
+      </Modal>
+
+      {isTiposAtendimentoLoading || isFetching ? (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />
         </div>
@@ -125,11 +178,10 @@ const TipoAtendimento = () => {
                       <TableCell>{tipoAtendimento.duration} minutos</TableCell>
                       <TableCell align="right">
                         <Button
-                          onClick={() =>
-                            handleDeleteAppointmentType(
-                              tipoAtendimento.id.toString(),
-                            )
-                          }
+                          onClick={() => {
+                            setDeleteAppointmentType(tipoAtendimento);
+                            setDeleteModalOpen(true);
+                          }}
                           size="small"
                           variant="contained"
                           color="error"
@@ -166,6 +218,7 @@ const TipoAtendimento = () => {
                 if (validateSubmit()) handleCreateNewAtendimento();
               }}
               variant="contained"
+              disabled={createAppointmentType.isLoading}
               sx={{ width: '50%' }}
             >
               Cadastrar
