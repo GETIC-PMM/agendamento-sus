@@ -58,3 +58,16 @@ export const useGetUnitByName = ({
     onSuccess,
   });
 };
+
+export const useDeleteUnit = () => {
+  return useMutation({
+    mutationFn: (unitId: number) =>
+      instance
+        .delete(`/units/${unitId}`)
+        .then(response => response.data)
+        .catch(error => {
+          console.error(error);
+          throw error;
+        }),
+  });
+};

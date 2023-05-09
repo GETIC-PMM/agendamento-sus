@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Modal from '@mui/material/Modal';
-import { useGetUnits } from '../api/routes/units-api';
+import { useDeleteUnit, useGetUnits } from '../api/routes/units-api';
 import { FiEdit, FiTrash } from 'react-icons/fi';
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -43,6 +43,7 @@ const ShowUnidades = () => {
   );
 
   const createSecretarie = useMutateRegisterSecretarie();
+  const deleteUnit = useDeleteUnit();
 
   const onSubmit = () => {
     createSecretarie.mutate({
@@ -64,6 +65,11 @@ const ShowUnidades = () => {
       }),
     );
     setSelectedAppointmentType(null);
+  };
+
+  const handleDelete = (unitId: number) => {
+    deleteUnit.mutate(unitId);
+    useGetUnits().refetch();
   };
 
   return (
@@ -134,7 +140,10 @@ const ShowUnidades = () => {
                             }}
                           />
                         </div>
-                        <div className="flex justify-center">
+                        <div
+                          className="flex justify-center"
+                          onClick={() => handleDelete(unit.id)}
+                        >
                           <FiTrash
                             color="white"
                             className={`w-8 h-8 p-2 bg-primary-base rounded cursor-pointer`}
