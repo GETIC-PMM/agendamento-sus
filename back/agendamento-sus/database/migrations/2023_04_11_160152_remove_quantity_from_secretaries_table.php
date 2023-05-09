@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('secretaries', function (Blueprint $table) {
-            $table->integer('quantity');
+            //
         });
     }
 };
