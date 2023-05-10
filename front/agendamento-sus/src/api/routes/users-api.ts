@@ -19,6 +19,19 @@ export const useMutateRegisterUser = () => {
   });
 };
 
+export const useMutateDeleteUser = () => {
+  return useMutation({
+    mutationFn: (id: string) =>
+      instanceNoAuth
+        .delete(`/users/${id}`)
+        .then(response => response.data)
+        .catch((error: Error) => {
+          console.error(error);
+          throw error;
+        }),
+  });
+};
+
 export const useGetUsers = () => {
   return useQuery({
     queryKey: ['users'],

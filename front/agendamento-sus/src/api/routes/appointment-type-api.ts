@@ -20,7 +20,13 @@ export const useAppointmentTypes = () => {
   });
 };
 
-export const useMutateRegisterAppointmentType = () => {
+export const useMutateRegisterAppointmentType = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}) => {
   return useMutation({
     mutationFn: (params: RegisterAppointmentTypeParams) =>
       instance
@@ -30,10 +36,18 @@ export const useMutateRegisterAppointmentType = () => {
           console.error(error);
           throw error;
         }),
+    onSuccess,
+    onError,
   });
 };
 
-export const useDeleteAppointmentType = () => {
+export const useDeleteAppointmentType = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}) => {
   return useMutation({
     mutationFn: (id: string) =>
       instance
@@ -43,5 +57,7 @@ export const useDeleteAppointmentType = () => {
           console.error(error);
           throw error;
         }),
+    onSuccess,
+    onError,
   });
 };

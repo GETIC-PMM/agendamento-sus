@@ -12,7 +12,7 @@ const FormAlert = (props: FormAlertProps) => {
       }`}
       role="alert"
     >
-      <strong className="font-bold">Erro no cadastro! </strong>
+      <strong className="font-bold">Erro! </strong>
       <span className="block sm:inline">{props.errorMessage}</span>
       <span
         className="absolute top-0 bottom-0 right-0 px-4 py-3"

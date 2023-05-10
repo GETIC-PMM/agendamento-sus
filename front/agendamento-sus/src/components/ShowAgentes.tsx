@@ -12,15 +12,17 @@ import {
   Box,
   IconButton,
   useTheme,
+  Modal,
+  Button,
 } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { FiSearch, FiEdit, FiTrash } from 'react-icons/fi';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import { Agente } from '../interfaces/interfaces';
-import { useGetUsers } from '../api/routes/users-api';
+import { useGetUsers, useMutateDeleteUser } from '../api/routes/users-api';
 import { Typography } from '@mui/material';
 
 interface TablePaginationActionsProps {
@@ -34,13 +36,19 @@ interface TablePaginationActionsProps {
 }
 
 const ShowAgentes = () => {
-  const [users, setUsers] = React.useState<Agente[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [users, setUsers] = useState<Agente[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const usersQuery = useGetUsers();
   const isUserFetching = usersQuery.isFetching;
   const isUserSuccess = usersQuery.isSuccess;
+  const refetch = usersQuery.refetch;
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteUserObject, setDeleteUserObject] = useState<Agente | null>(null);
+
+  const deleteUser = useMutateDeleteUser();
 
   function TablePaginationActions(props: TablePaginationActionsProps) {
     const theme = useTheme();
@@ -126,8 +134,54 @@ const ShowAgentes = () => {
     setPage(0);
   };
 
+  const handleDelete = (user: Agente) => {
+    deleteUser.mutate(user.id.toString());
+    setDeleteModalOpen(false);
+    refetch();
+  };
+
   return (
     <div>
+      <Modal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div className="p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded">
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Deletar unidade
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Tem certeza que deseja deletar essa unidade?
+            {deleteUserObject && (
+              <Typography align="center" fontSize={14}>
+                {deleteUserObject.name}
+              </Typography>
+            )}
+            <div className="flex justify-around mt-6">
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  handleDelete(deleteUserObject!);
+                }}
+              >
+                Confirmar
+              </Button>
+            </div>
+          </Typography>
+        </div>
+      </Modal>
+
       <div className="border-l-4 border-blue-700 pl-2 mb-4">
         <Typography
           className="text-blue-700"
@@ -137,11 +191,11 @@ const ShowAgentes = () => {
           Agentes de saúde
         </Typography>
       </div>
-      {(isUserFetching && (
+      {isUserFetching ? (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />
         </div>
-      )) || (
+      ) : (
         <TableContainer component={Paper} className="whitespace-nowrap">
           <Table aria-label="simple table">
             <TableHead>
@@ -171,17 +225,21 @@ const ShowAgentes = () => {
                   <TableCell align="center">{row.email}</TableCell>
                   <TableCell align="center">
                     <div className="flex justify-center gap-2">
-                      <FiSearch
+                      {/* <FiSearch
                         color="white"
                         className="w-8 h-8 p-2 bg-primary-base rounded cursor-pointer"
                       />
                       <FiEdit
                         color="white"
                         className="w-8 h-8 p-2 bg-yellow-warning rounded cursor-pointer"
-                      />
+                      /> */}
                       <FiTrash
                         color="white"
                         className="w-8 h-8 p-2 bg-red-error rounded cursor-pointer"
+                        onClick={() => {
+                          setDeleteUserObject(row);
+                          setDeleteModalOpen(true);
+                        }}
                       />
                     </div>
                   </TableCell>
