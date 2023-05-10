@@ -192,7 +192,7 @@ class AppointmentController extends BaseController
         return $this->sendResponse($appointments, 'Appointments retrieved successfully.');
     }
 
-    public function checkSlots(string $unit, string $appointment, string $date)
+    public function checkSlots(string $unit, string $appointment, string $cpf, string $date)
     {
         $dotw = Carbon::parse($date)->dayOfWeek;
         $day = $this->translateDate($dotw);
@@ -205,21 +205,25 @@ class AppointmentController extends BaseController
                 $slots = $value['slots'];
         }
 
+        $appointmentsPacient = Appointment::where('cpf', $cpf)->where('appointment_type_id', $appointment)->count();
+
         if ($appointments >= $slots)
             return $this->sendResponse(false, 'Appointments verified successfully.');
-        else
-            return $this->sendResponse(true, 'Appointments verified successfully.');
-    }
-
-    public function checkSlotsByPatient(string $appointment_id, string $cpf)
-    {
-        $appointments = Appointment::where('cpf', $cpf)->where('appointment_type_id', $appointment_id)->count();
-
-        if ($appointments >= 1)
+        else if ($appointmentsPacient >= 1)
             return $this->sendResponse(false, 'Appointments verified successfully.');
         else
             return $this->sendResponse(true, 'Appointments verified successfully.');
     }
+
+    // public function checkSlotsByPatient(string $appointment_id, string $cpf)
+    // {
+
+
+    //     if ($appointments >= 1)
+    //         return $this->sendResponse(false, 'Appointments verified successfully.');
+    //     else
+    //         return $this->sendResponse(true, 'Appointments verified successfully.');
+    // }
 
     public function translateDate($day)
     {
