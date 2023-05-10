@@ -3,10 +3,11 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Select,
   TextField,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as dayjs from 'dayjs';
@@ -15,58 +16,20 @@ import { telFormatter } from '../../utils/tel-formatter';
 import { useGetUnitByName } from '../../api/routes/units-api';
 import { useUnitSecretaries } from '../../api/routes/secretaries-api';
 import { useMutateRegisterAppointment } from '../../api/routes/appointments-api';
-import { useNavigate } from 'react-router-dom';
-
-interface TiposAtendimentoType {
-  id: number;
-  name: string;
-  duration: number;
-}
-
-export interface SecretariesType {
-  id_unit: number;
-  appointment_type_id: number;
-  days: [
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-    {
-      day: string;
-      slots: number;
-    },
-  ];
-}
+import { Navigate, useNavigate } from 'react-router-dom';
+import { CitizenContext } from '../../main';
 
 const AgendarAtendimento = () => {
   const navigate = useNavigate();
 
   // const citizen = useContext(CitizenContext);
-  const [tiposAtendimento, setTiposAtendimento] = useState<
-    TiposAtendimentoType[]
-  >([]);
-  const [typesInThisUnit, setTypesInThisUnit] = useState<SecretariesType[]>([]);
-  const [avaliableDays, setAvaliableDays] = useState<Number[]>([]);
+
+  const citizen = {
+    name: 'Joao',
+    unit: 'CLINICA ODONTOFISIOMED',
+    cpf: '123',
+  };
+
   const [telefone, setTelefone] = useState<string>('');
   const [isWhatsapp, setIsWhatsapp] = useState<string>('');
   const [unitId, setUnitId] = useState<number | null>(null);
@@ -75,14 +38,8 @@ const AgendarAtendimento = () => {
 
   const [selectedType, setSelectedType] = useState('');
 
-  const citizen = {
-    name: 'João',
-    cpf: '18467496460',
-    unit: 'CLINICA ODONTOFISIOMED',
-  };
-
   const unidade = useGetUnitByName({
-    unit: citizen.unit,
+    unit: citizen!.unit,
     onSuccess: data => {
       setUnitId(data.data[0].id);
     },
@@ -141,6 +98,8 @@ const AgendarAtendimento = () => {
 
   //   return resultDate;
   // };
+  if (!citizen || Object.values(citizen).some(value => value === ''))
+    return <Navigate to={'/'} />;
 
   return (
     <div>
@@ -149,8 +108,8 @@ const AgendarAtendimento = () => {
           <CircularProgress />
         </div>
       ) : (
-        <div className="w-full flex items-center justify-center bg-login-bg bg-cover overflow-x-hidden">
-          <div className="py-16 my-10 md:px-[140px] px-4 w-full md:w-[75%] bg-primary-base flex items-center md:rounded-[10px] font-medium flex-col gap-7 relative">
+        <div className="w-full h-screen flex items-center justify-center bg-login-bg bg-cover overflow-x-hidden">
+          <div className="py-16 my-10 md:px-[140px] px-4 md:w-[75%] bg-primary-base flex items-center md:rounded-[10px] font-medium flex-col gap-7 relative">
             <div>
               <h1 className="text-white text-2xl ">{`Bem-vindo(a), ${citizen?.name}.`}</h1>
               <h3 className="text-white text-base text-center font-light">
@@ -285,25 +244,11 @@ const AgendarAtendimento = () => {
                   </RadioGroup>
 
                   <h2 className="text-zinc-200 text-sm mt-3">
-                    Escolha a data:
+                    Escolha o dia da semana:
                   </h2>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      value={date}
-                      disabled={selectedType === ''}
-                      onChange={newValue => {
-                        setDate(newValue as Date);
-                      }}
-                      // shouldDisableDate={shouldDisableDate}
-                      className="w-full text-white bg-white pl-4 border rounded-md"
-                      renderInput={params => (
-                        <TextField
-                          sx={{ width: '100%' }}
-                          className="w - full text- white bg-zinc-300 pl-4 border rounded-md"
-                          {...params}
-                        />
-                      )}
-                    />
+                    {/* <Select>
+                    </Select> */}
                   </LocalizationProvider>
                 </div>
               </div>
@@ -320,7 +265,7 @@ const AgendarAtendimento = () => {
                     cpf: citizen.cpf,
                     name: citizen.name,
                     unit_id: unidade.data?.data[0].id!,
-                    status: 'agendado',
+                    status: 'Agendado',
                   })
                 }
               >
