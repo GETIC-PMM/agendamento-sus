@@ -11,8 +11,6 @@ import {
 
 const Agendamento = () => {
   const [cpf, setCpf] = useState<string>('');
-  const [nomeCompleto, setNomeCompleto] = useState<string>('');
-  const [unidade, setUnidade] = useState<string>('');
 
   const [incorrectCpf, setIncorrectCpf] = useState<boolean>(false);
 
@@ -84,8 +82,8 @@ const Agendamento = () => {
   const handleAgendamento = () => {
     if (citizen) {
       citizen.cpf = cpf;
-      citizen.name = nomeCompleto;
-      citizen.unit = unidade;
+      citizen.name = patientNameQuery.data?.data.no_cidadao!;
+      citizen.unit = patientUnitQuery.data?.data.no_unidade_saude!;
     }
     navigate('/agendamento');
   };
@@ -193,9 +191,6 @@ const Agendamento = () => {
               id="nome"
               disabled
               value={isSuccess ? patientNameQuery.data?.data.no_cidadao : ''}
-              onChange={e => {
-                setNomeCompleto(e.target.value);
-              }}
             />
           </div>
 
@@ -211,9 +206,6 @@ const Agendamento = () => {
               value={
                 isSuccess ? patientUnitQuery.data?.data.no_unidade_saude : ''
               }
-              onChange={e => {
-                setUnidade(e.target.value);
-              }}
             />
           </div>
 

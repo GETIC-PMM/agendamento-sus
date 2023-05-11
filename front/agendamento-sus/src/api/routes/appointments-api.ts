@@ -17,6 +17,23 @@ export const useUnitAppointmentsById = (unitId: number) => {
   });
 };
 
+export const useCheckAppointment = (
+  unitId: number,
+  appointmentId: number,
+  date: Date,
+  cpf: string,
+) => {
+  return useQuery({
+    queryKey: ['appointments', unitId, appointmentId, date, cpf],
+    queryFn: () =>
+      instance
+        .get<APIResponse<Appointment[]>>(
+          `appointments/check/${unitId}/${appointmentId}/${cpf}/${date}`,
+        )
+        .then(response => response.data),
+  });
+};
+
 export const useMutateRegisterAppointment = ({
   onSuccess,
 }: {
