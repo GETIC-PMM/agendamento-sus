@@ -208,11 +208,11 @@ class AppointmentController extends BaseController
         $appointmentsPacient = Appointment::where('cpf', $cpf)->where('appointment_type_id', $appointment)->count();
 
         if ($appointments >= $slots)
-            return $this->sendResponse(false, 'Appointments verified successfully.');
+            return $this->sendResponse(false, 'Não há mais vagas disponíveis para esse dia.');
         else if ($appointmentsPacient >= 1)
-            return $this->sendResponse(false, 'Appointments verified successfully.');
+            return $this->sendResponse(false, 'Já existe um agendamento para esse CPF e tipo de consulta.');
         else
-            return $this->sendResponse(true, 'Appointments verified successfully.');
+            return $this->sendResponse(true, 'Agendamento disponível.');
     }
 
     // public function checkSlotsByPatient(string $appointment_id, string $cpf)
