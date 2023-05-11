@@ -1,42 +1,60 @@
 import {
   CircularProgress,
   FormControlLabel,
+  MenuItem,
   Radio,
   RadioGroup,
   Select,
-  TextField,
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { useContext, useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import * as dayjs from 'dayjs';
 import { cpfFormatter } from '../../utils/cpf-formatter';
 import { telFormatter } from '../../utils/tel-formatter';
 import { useGetUnitByName } from '../../api/routes/units-api';
 import { useUnitSecretaries } from '../../api/routes/secretaries-api';
-import { useMutateRegisterAppointment } from '../../api/routes/appointments-api';
+import {
+  useCheckAppointment,
+  useMutateRegisterAppointment,
+} from '../../api/routes/appointments-api';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { weekdaysTranslation } from '../../utils/consts';
+import { AvaliableDay as SecretarieAvaliableDay } from '../../interfaces/interfaces';
+import { getDateByWeekday } from '../../utils';
 import { CitizenContext } from '../../main';
 
 const AgendarAtendimento = () => {
   const navigate = useNavigate();
 
-  // const citizen = useContext(CitizenContext);
+  const citizen = useContext(CitizenContext);
 
-  const citizen = {
-    name: 'Joao',
-    unit: 'CLINICA ODONTOFISIOMED',
-    cpf: '123',
-  };
+  // const citizen = {
+  //   name: 'Joao',
+  //   unit: 'CLINICA ODONTOFISIOMED',
+  //   cpf: '22099379445',
+  // };
 
   const [telefone, setTelefone] = useState<string>('');
   const [isWhatsapp, setIsWhatsapp] = useState<string>('');
   const [unitId, setUnitId] = useState<number | null>(null);
 
-  const [date, setDate] = useState<Date>(dayjs(new Date()).toDate());
+  const [date, setDate] = useState<
+    null | (typeof weekdaysTranslation)[keyof typeof weekdaysTranslation]
+  >(null);
 
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState<SecretarieAvaliableDay>({
+    appointment_type_id: 0,
+    days: [],
+  });
+
+  const enableButton =
+    telefone !== '' &&
+    isWhatsapp !== '' &&
+    date !== null &&
+    unitId !== null &&
+    selectedType.appointment_type_id !== 0 &&
+    selectedType.appointment_type_id !== 0;
 
   const unidade = useGetUnitByName({
     unit: citizen!.unit,
@@ -46,6 +64,12 @@ const AgendarAtendimento = () => {
   });
 
   const unitAppointmentTypes = useUnitSecretaries({
+    onSuccess: data => {
+      setSelectedType({
+        appointment_type_id: data.data[0].appointment_type_id,
+        days: data.data[0].days.filter(day => day.slots > 0),
+      });
+    },
     unitId: unitId,
   });
 
@@ -54,50 +78,41 @@ const AgendarAtendimento = () => {
       alert('Agendamento realizado com sucesso!');
       navigate('/');
     },
+    onError: () => {
+      alert('Erro ao realizar agendamento');
+    },
   });
 
-  // const shouldDisableDate = (date: Date) => {
-  //   const appointmentType = typesInThisUnit.find(type => {
-  //     return type.appointment_type_id.toString() === selectedType;
-  //   }) as SecretariesType;
+  const checkAppointment = useCheckAppointment(
+    unitId!,
+    selectedType.appointment_type_id,
+    getDateByWeekday(date!),
+    citizen!.cpf,
+    data => {
+      data.data
+        ? registerAppointment.mutate({
+            appointment_type_id: selectedType.appointment_type_id,
+            date: getDateByWeekday(date!),
+            phone_number: telefone,
+            is_phone_number_whatsapp: isWhatsapp === 'sim' ? true : false,
+            cpf: citizen!.cpf,
+            name: citizen!.name,
+            unit_id: unidade.data?.data[0].id!,
+            status: 'Agendado',
+          })
+        : alert(data.message);
+    },
+  );
 
-  //   const _day = dayjs(date).day();
+  const secretariesAvaliableDays = unitAppointmentTypes.data?.data.map(
+    secretary => {
+      return {
+        appointment_type_id: secretary.appointment_type_id,
+        days: secretary.days.filter(day => day.slots > 0),
+      };
+    },
+  ) as SecretarieAvaliableDay[];
 
-  //   let resultDate;
-  //   if (_day === 0) {
-  //     appointmentType?.days[0].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 1) {
-  //     appointmentType?.days[1].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 2) {
-  //     appointmentType?.days[2].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 3) {
-  //     appointmentType?.days[3].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 4) {
-  //     appointmentType?.days[4].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 5) {
-  //     appointmentType?.days[5].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else if (_day === 6) {
-  //     appointmentType?.days[6].slots === 0
-  //       ? (resultDate = true)
-  //       : (resultDate = false);
-  //   } else {
-  //     resultDate = false;
-  //   }
-
-  //   return resultDate;
-  // };
   if (!citizen || Object.values(citizen).some(value => value === ''))
     return <Navigate to={'/'} />;
 
@@ -212,10 +227,15 @@ const AgendarAtendimento = () => {
                   </h2>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue=""
-                    value={selectedType}
+                    value={selectedType.appointment_type_id}
                     onChange={e => {
-                      setSelectedType(e.target.value);
+                      setSelectedType(
+                        secretariesAvaliableDays.find(
+                          secretarieAvaliableDays =>
+                            secretarieAvaliableDays.appointment_type_id ===
+                            Number.parseInt(e.target.value),
+                        ) ?? ({} as SecretarieAvaliableDay),
+                      );
                     }}
                     name="radio-buttons-group"
                     className="mt-2"
@@ -247,27 +267,39 @@ const AgendarAtendimento = () => {
                     Escolha o dia da semana:
                   </h2>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    {/* <Select>
-                    </Select> */}
+                    <Select
+                      value={date ?? 'none'}
+                      onChange={e => {
+                        setDate(
+                          e.target.value !== 'none'
+                            ? (e.target
+                                .value as (typeof weekdaysTranslation)[keyof typeof weekdaysTranslation])
+                            : null,
+                        );
+                      }}
+                      className="w-full h-12 pl-4 border rounded-xl bg-white"
+                      error={registerAppointment.isError && date === null}
+                    >
+                      <MenuItem value={'none'}>Dia da semana</MenuItem>
+                      {selectedType.days.map((weekday, index) => {
+                        return (
+                          <MenuItem key={index} value={weekday.day}>
+                            {weekday.day}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
                   </LocalizationProvider>
                 </div>
               </div>
 
               <button
-                className="bg-green-800 text-white rounded-lg py-3 self-center px-4 max-w-fit md:w-full mt-4"
-                onClick={() =>
-                  registerAppointment.mutate({
-                    appointment_type_id: Number.parseInt(selectedType),
-                    date: date,
-                    phone_number: telefone,
-                    is_phone_number_whatsapp:
-                      isWhatsapp === 'sim' ? true : false,
-                    cpf: citizen.cpf,
-                    name: citizen.name,
-                    unit_id: unidade.data?.data[0].id!,
-                    status: 'Agendado',
-                  })
+                disabled={registerAppointment.isLoading || !enableButton}
+                className={
+                  'text-white rounded-lg py-3 self-center px-4 max-w-fit md:w-full mt-4 ' +
+                  (enableButton ? 'bg-green-700' : 'bg-gray-500')
                 }
+                onClick={() => checkAppointment.refetch()}
               >
                 Confirmar agendamento
               </button>

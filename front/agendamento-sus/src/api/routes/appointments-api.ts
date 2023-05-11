@@ -22,22 +22,30 @@ export const useCheckAppointment = (
   appointmentId: number,
   date: Date,
   cpf: string,
+  onSuccess?: (data: APIResponse<boolean>) => void,
+  onError?: (data: APIResponse<boolean>) => void,
 ) => {
+  console.log(date);
   return useQuery({
     queryKey: ['appointments', unitId, appointmentId, date, cpf],
     queryFn: () =>
       instance
-        .get<APIResponse<Appointment[]>>(
-          `appointments/check/${unitId}/${appointmentId}/${cpf}/${date}`,
+        .get<APIResponse<boolean>>(
+          `appointments/check/${unitId}/${appointmentId}/${cpf}/${date.toISOString()}`,
         )
         .then(response => response.data),
+    onSuccess,
+    onError,
+    enabled: false,
   });
 };
 
 export const useMutateRegisterAppointment = ({
   onSuccess,
+  onError,
 }: {
   onSuccess?: () => void;
+  onError?: () => void;
 }) => {
   return useMutation({
     mutationFn: (params: RegisterAppointmentParams) =>
@@ -46,6 +54,7 @@ export const useMutateRegisterAppointment = ({
         error => console.error(error),
       ),
     onSuccess,
+    onError,
   });
 };
 
