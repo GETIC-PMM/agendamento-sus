@@ -235,10 +235,10 @@ const ShowAgentes = () => {
                       /> */}
                       <FiTrash
                         color="white"
-                        className="w-8 h-8 p-2 bg-red-error rounded cursor-pointer"
+                        className="w-8 h-8 p-2 bg-red-error rounded"
                         onClick={() => {
-                          setDeleteUserObject(row);
-                          setDeleteModalOpen(true);
+                          // setDeleteUserObject(row);
+                          // setDeleteModalOpen(true);
                         }}
                       />
                     </div>
