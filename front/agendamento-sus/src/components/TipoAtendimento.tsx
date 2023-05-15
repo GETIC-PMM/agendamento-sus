@@ -47,7 +47,8 @@ const TipoAtendimento = () => {
     onError(error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(
-          error.message || 'Já existe um tipo de atendimento com esse nome.',
+          error.response?.data.message ||
+            'Já existe um tipo de atendimento com esse nome.',
         );
       }
       setShowError(true);
@@ -127,12 +128,10 @@ const TipoAtendimento = () => {
         aria-describedby="modal-modal-description"
       >
         <div className="p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded">
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Deletar unidade
-          </Typography>
           <Typography
             id="modal-modal-description"
             textAlign={'justify'}
+            variant="body2"
             sx={{ mt: 2 }}
           >
             Tem certeza que deseja deletar esse tipo de atendimento?
@@ -166,7 +165,7 @@ const TipoAtendimento = () => {
         </div>
       </Modal>
 
-      {isFetching || isTiposAtendimentoLoading ? (
+      {isTiposAtendimentoLoading ? (
         <div className="h-[calc(100vh-141.6px)] w-full flex items-center justify-center">
           <CircularProgress />
         </div>
@@ -177,9 +176,13 @@ const TipoAtendimento = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tipo de atendimento</TableCell>
-                    <TableCell>Duração</TableCell>
-                    <TableCell align="right">Excluir</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>
+                      Tipo de atendimento
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Duração</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }} align="right">
+                      Excluir
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -224,6 +227,7 @@ const TipoAtendimento = () => {
                 onChange={event => {
                   setNewDuration(Number(event.target.value));
                 }}
+                type="number"
                 sx={{ width: '50%' }}
                 label="Duração (em minutos)"
               />

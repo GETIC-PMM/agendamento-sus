@@ -102,15 +102,19 @@ const ShowUnidades = () => {
         aria-describedby="modal-modal-description"
       >
         <div className="p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded">
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Deletar unidade
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography
+            id="modal-modal-description"
+            textAlign={'justify'}
+            variant="body2"
+            sx={{ mt: 2 }}
+          >
             Tem certeza que deseja deletar essa unidade?
             {deleteUnitObject && (
-              <Typography align="center" fontSize={14}>
-                {deleteUnitObject.name}
-              </Typography>
+              <div className="border-2 rounded py-5 mt-2">
+                <Typography align="center" fontSize={14}>
+                  {deleteUnitObject.name}
+                </Typography>
+              </div>
             )}
             <div className="flex justify-around mt-6">
               <Button

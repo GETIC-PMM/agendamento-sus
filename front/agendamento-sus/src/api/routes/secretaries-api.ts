@@ -3,7 +3,7 @@ import { instance } from '../instance';
 import {
   APIResponse,
   RegisterSecretarieParams,
-  Secretaries,
+  Secretarie,
 } from '../../interfaces/interfaces';
 
 export const useUnitSecretaries = ({
@@ -12,14 +12,14 @@ export const useUnitSecretaries = ({
   onError,
 }: {
   unitId: number | null;
-  onSuccess?: (data: APIResponse<Secretaries[]>) => void;
+  onSuccess?: (data: APIResponse<Secretarie[]>) => void;
   onError?: (error: any) => void;
 }) => {
   return useQuery({
     queryKey: ['unitSecretaries', unitId],
     queryFn: () =>
       instance
-        .get<APIResponse<Secretaries[]>>(
+        .get<APIResponse<Secretarie[]>>(
           `/secretaries/appointment_type/${unitId}`,
         )
         .then(response => response.data)

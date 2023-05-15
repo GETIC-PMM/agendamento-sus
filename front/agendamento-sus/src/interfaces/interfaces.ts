@@ -1,3 +1,5 @@
+import { weekdaysTranslation } from '../utils/consts';
+
 export type APIResponse<T> = {
   sucess: boolean;
   data: T;
@@ -55,12 +57,14 @@ export interface DaysInterface {
   slots: number;
 }
 
-export interface Secretaries {
+export interface Secretarie {
   appointment_type_id: number;
   appointment_type_name: string;
   days: DaysInterface[];
   unit_id: number;
 }
+
+export type AvaliableDay = Pick<Secretarie, 'appointment_type_id' | 'days'>;
 
 export type Patient = {
   co_seq_cidadao: number;
