@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Unit;
 use App\Http\Resources\UnitResource;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -115,9 +116,14 @@ class UnitController extends BaseController
      */
     public function destroy(Unit $unit)
     {
-        $unit->delete();
+        $appointments = Appointment::where('unit_id', $unit->id)->first();
 
-        return $this->sendResponse([], 'Unit deleted successfully.')->object();
+        if ($appointments != null) {
+            return $this->sendError('Unit has appointments.');
+        } else {
+            $unit->delete();
+            return $this->sendResponse($unit, 'Unit deleted successfully.');
+        }
     }
 
     public function search()
