@@ -8,8 +8,10 @@ import { instance } from '../instance';
 
 export const useLogin = ({
   onSuccess,
+  onError,
 }: {
   onSuccess: (data: string) => void;
+  onError: (error: any) => void;
 }) => {
   return useMutation({
     mutationFn: (params: LoginParams) =>
@@ -19,6 +21,7 @@ export const useLogin = ({
           return response.data.data.token;
         }),
     onSuccess,
+    onError,
   });
 };
 

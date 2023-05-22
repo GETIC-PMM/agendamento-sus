@@ -21,6 +21,16 @@ const Login = () => {
       Cookies.set('token', data, { expires: expireDate });
       navigate('/admin/dashboard');
     },
+    onError: error => {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 500) {
+          alert('Erro ao fazer login, tente novamente mais tarde.');
+        } else
+          alert(
+            'E-mail ou senha incorretos, por favor verifique os dados e tente novamente.',
+          );
+      }
+    },
   });
 
   const navigate = useNavigate();
